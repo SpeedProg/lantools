@@ -38,7 +38,7 @@
 		</listener>
 	</listeners>
 		<resources>
-		<res id="HTMLLicencePanel.licence" src=".\..\app\LICENSE.txt"/>
+		<res id="HTMLLicencePanel.licence" src=".\..\app\LICENSE"/>
 		<res id="shortcutSpec.xml" src="./ShortcutPanel.xml"/>
 	</resources>
 	<native type="izpack" name="ShellLink.dll">
@@ -56,27 +56,27 @@
 	<packs>
 		<pack name="html" required="yes" preselected="yes" hidden="false">
 			<description>html</description>
-			<file src="F:\Releases\PC\LanTools\v1.0.0\rc2\app\html" targetdir="$INSTALL_PATH/" override="true"/>
+			<file src="..\app\html" targetdir="$INSTALL_PATH/" override="true"/>
 		</pack>
 		<pack name="LanTools.exe" required="yes" preselected="yes" hidden="false" os="windows">
 			<description>LanTools.exe</description>
-			<file src="F:\Releases\PC\LanTools\v1.0.0\rc2\app\LanTools.exe" targetdir="$INSTALL_PATH/" override="true"/>
+			<file src="..\app\LanTools.exe" targetdir="$INSTALL_PATH/" override="true"/>
 		</pack>
 		<pack name="LanTools.jar" required="yes" preselected="yes" hidden="false">
 			<description>LanTools.jar</description>
-			<file src="F:\Releases\PC\LanTools\v1.0.0\rc2\app\LanTools.jar" targetdir="$INSTALL_PATH/" override="true"/>
+			<file src="..\app\LanTools.jar" targetdir="$INSTALL_PATH/" override="true"/>
 		</pack>
 		<pack name="LICENSE.txt" required="yes" preselected="yes" hidden="false">
-			<description>LICENSE.txt</description>
-			<file src="F:\Releases\PC\LanTools\v1.0.0\rc2\app\LICENSE.txt" targetdir="$INSTALL_PATH/" override="true"/>
+			<description>LICENSE</description>
+			<file src="..\app\LICENSE" targetdir="$INSTALL_PATH/" override="true"/>
 		</pack>
 		<pack name="NOTICE" required="yes" preselected="yes" hidden="false">
 			<description>NOTICE</description>
-			<file src="F:\Releases\PC\LanTools\v1.0.0\rc2\app\NOTICE" targetdir="$INSTALL_PATH/" override="true"/>
+			<file src="..\app\NOTICE" targetdir="$INSTALL_PATH/" override="true"/>
 		</pack>
 		<pack name="templates" required="yes" preselected="yes" hidden="false">
 			<description>templates</description>
-			<file src="F:\Releases\PC\LanTools\v1.0.0\rc2\app\templates" targetdir="$INSTALL_PATH/" override="true"/>
+			<file src="..\app\templates" targetdir="$INSTALL_PATH/" override="true"/>
 		</pack>
 	</packs>
 </installation>

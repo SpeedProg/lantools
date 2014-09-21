@@ -69,6 +69,12 @@ public class LanTools {
     }
 
     public static void main(final String[] args) {
+        if (args.length > 0) {
+            if (args[0].equals("--vstring")) {
+                System.out.print(VERSION_STRING);
+                return;
+            }
+        }
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -91,8 +97,8 @@ public class LanTools {
         }));
     }
 
-    public static final String VERSION_STRING = "1.0.0RC1";
-    public static final Integer VERSION_NUM = 4;
+    public static final String VERSION_STRING = "1.0.0-RC3";
+    public static final Integer VERSION_NUM = 5;
     private static Configuration CFG = null;
     private static final Settings SETTINGS = new Settings("." + File.separator
             + "settings.xml");
