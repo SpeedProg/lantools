@@ -1,0 +1,176 @@
+// ------------------------------------------------------------------
+// NOTICE file corresponding to the section 4d of The Apache License,
+// Version 2.0, in this case for LanTools
+// ------------------------------------------------------------------
+
+LanTools
+Copyright 2014 Constantin Wenger
+
+Apache Abdera
+Copyright 2006-2012 Apache Software Foundation
+
+This product includes/uses software(s) developed by 'an unknown organization'
+  - JavaBeans Activation Framework (JAF) (http://java.sun.com/products/javabeans/jaf/index.jsp)
+  - JavaMail API (https://glassfish.dev.java.net/javaee5/mail/)
+  - ezmorph (http://ezmorph.sourceforge.net)
+
+This product includes/uses software(s) developed by 'Apache Software Foundation' (http://jakarta.apache.org/)
+  - HttpClient (http://jakarta.apache.org/httpcomponents/httpclient-3.x/)
+
+This product includes/uses software(s) developed by 'Apache Software Foundation' (http://www.apache.org)
+  - Unnamed - commons-collections:commons-collections:jar:3.1
+  - Streaming API for XML (STAX API 1.0) (http://geronimo.apache.org/specs/geronimo-stax-api_1.0_spec)
+
+This product includes/uses software(s) developed by 'Apache Software Foundation' (http://www.apache.org/)
+  - Abdera Client (http://abdera.apache.org/abdera-client)
+  - Abdera Core (http://abdera.apache.org/abdera-core)
+  - Abdera Extensions - GData (http://abdera.apache.org/abdera-extensions-gdata)
+  - Abdera Extensions - Geo (http://abdera.apache.org/abdera-extensions-geo)
+  - Abdera Extensions - HTML (http://abdera.apache.org/abdera-extensions-html)
+  - Abdera Extensions - JSON (http://abdera.apache.org/abdera-extensions-json)
+  - Abdera Extensions - Main (http://abdera.apache.org/abdera-extensions-main)
+  - Abdera Extensions - Media (http://abdera.apache.org/abdera-extensions-media)
+  - Abdera Extensions - OAuth (http://abdera.apache.org/abdera-extensions-oauth)
+  - Abdera Extensions - OpenSearch (http://abdera.apache.org/abdera-extensions-opensearch)
+  - Abdera Extensions - Serializer (http://abdera.apache.org/abdera-extensions-serializer)
+  - Abdera Extensions - Sharing (http://abdera.apache.org/abdera-extensions-sharing)
+  - Abdera Extensions - WSSE (http://abdera.apache.org/abdera-extensions-wsse)
+  - I18N Libraries (http://abdera.apache.org)
+  - Abdera Parser (http://abdera.apache.org/abdera-parser)
+  - Abdera Security (http://abdera.apache.org/abdera-security)
+  - Abdera Server (http://abdera.apache.org/abdera-server)
+
+This product includes/uses software(s) developed by 'Codehaus' (http://www.codehaus.org/)
+  - Stax2 API (http://woodstox.codehaus.org/StAX2)
+  - Woodstox (http://woodstox.codehaus.org)
+  - Woodstox (http://woodstox.codehaus.org)
+
+This product includes/uses software(s) developed by 'Json-lib' (http://json-lib.sourceforge.net)
+  - json-lib (http://json-lib.sourceforge.net)
+
+This product includes/uses software(s) developed by 'Mort Bay Consulting' (http://www.mortbay.com)
+  - Jetty Server (http://www.eclipse.org/jetty/jetty-parent/project/modules/jetty)
+  - Jetty Utilities (http://www.eclipse.org/jetty/jetty-parent/project/jetty-util)
+  - Servlet Specification API (http://jetty.mortbay.org/servlet-api)
+
+This product includes/uses software(s) developed by 'Sun Microsystems' (http://www.sun.com/)
+  - Servlet API
+
+This product includes/uses software(s) developed by 'The Apache Software Foundation' (http://jakarta.apache.org)
+  - Logging (http://jakarta.apache.org/commons/logging/)
+
+This product includes/uses software(s) developed by 'The Apache Software Foundation' (http://www.apache.org)
+  - Apache Commons Beanutils
+  - Activation 1.1 (http://geronimo.apache.org/maven/specs/geronimo-activation_1.1_spec/1.1)
+  - JavaMail 1.4 (http://geronimo.apache.org/maven/specs/geronimo-javamail_1.4_spec/1.7.1)
+  - XML APIs (http://xml.apache.org/commons/components/external/xml-apis)
+
+This product includes/uses software(s) developed by 'The Apache Software Foundation' (http://www.apache.org/)
+  - Commons Codec (http://commons.apache.org/codec/)
+  - Commons Lang (http://commons.apache.org/lang/)
+  - Apache JAMES Mime4j (Core) (http://james.apache.org/mime4j/apache-mime4j-core)
+  - Axiom API (http://ws.apache.org/axiom/)
+  - Axiom Impl (http://ws.apache.org/axiom/axiom-impl)
+  - Apache Xalan-Java
+  - Xerces2 Java Parser (http://xerces.apache.org/xerces2-j)
+  - XML Security (http://santuario.apache.org/xmlsec)
+
+This product includes/uses software(s) developed by 'The Werken Company' (http://jaxen.codehaus.org)
+  - Jaxen (http://jaxen.codehaus.org/jaxen)
+
+This product includes/uses software(s) developed by 'Validator.nu' (http://about.validator.nu/htmlparser)
+  - The Validator.nu HTML Parser (http://about.validator.nu/htmlparser/htmlparser)
+
+
+Portions of Abdera were orginally developed by
+International Business Machines Corporation and are
+licensed to the Apache Software Foundation under the
+"Software Grant and Corporate Contribution License Agreement",
+informally known as the "Abdera CLA".
+
+This software's test suite contains data files derived from the
+Universal Feed Parser, Copyright (c) 2002-2005, Mark Pilgrim.
+
+This software includes a partial implementation of Unicode 5.0.0.
+
+=========================================================================
+== Unicode License Statement (http://www.unicode.org/copyright.html)   ==
+=========================================================================
+
+Unicode Data Files include all data files under the directories 
+http://www.unicode.org/Public/, http://www.unicode.org/reports/, 
+and http://www.unicode.org/cldr/data/ . Unicode Software includes any
+source code published in the Unicode Standard or under the directories 
+http://www.unicode.org/Public/, http://www.unicode.org/reports/, and 
+http://www.unicode.org/cldr/data/.
+
+NOTICE TO USER: Carefully read the following legal agreement. BY DOWNLOADING, 
+INSTALLING, COPYING OR OTHERWISE USING UNICODE INC.'S DATA FILES ("DATA FILES"), 
+AND/OR SOFTWARE ("SOFTWARE"), YOU UNEQUIVOCALLY ACCEPT, AND AGREE TO BE BOUND BY, 
+ALL OF THE TERMS AND CONDITIONS OF THIS AGREEMENT. IF YOU DO NOT AGREE, DO NOT 
+DOWNLOAD, INSTALL, COPY, DISTRIBUTE OR USE THE DATA FILES OR SOFTWARE.
+
+COPYRIGHT AND PERMISSION NOTICE
+
+Copyright © 1991-2007 Unicode, Inc. All rights reserved. Distributed under the 
+Terms of Use in http://www.unicode.org/copyright.html.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+the Unicode data files and any associated documentation (the "Data Files") or 
+Unicode software and any associated documentation (the "Software") to deal in 
+the Data Files or Software without restriction, including without limitation 
+the rights to use, copy, modify, merge, publish, distribute, and/or sell copies 
+of the Data Files or Software, and to permit persons to whom the Data Files or 
+Software are furnished to do so, provided that (a) the above copyright notice(s) 
+and this permission notice appear with all copies of the Data Files or Software, 
+(b) both the above copyright notice(s) and this permission notice appear in
+associated documentation, and (c) there is clear notice in each modified Data 
+File or in the Software as well as in the documentation associated with the Data 
+File(s) or Software that the data or software has been modified.
+
+THE DATA FILES AND SOFTWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. IN 
+NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS NOTICE BE LIABLE 
+FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES 
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF 
+CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION 
+WITH THE USE OR PERFORMANCE OF THE DATA FILES OR SOFTWARE.
+
+Except as contained in this notice, the name of a copyright holder shall not be 
+used in advertising or otherwise to promote the sale, use or other dealings in 
+these Data Files or Software without prior written authorization of the 
+copyright holder.
+
+====
+
+Additional copyright notices and license terms applicable are
+present in the lib directory of this distribution.
+
+Apache Commons Codec
+Copyright 2002-2013 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+src/test/org/apache/commons/codec/language/DoubleMetaphoneTest.java
+contains test data from http://aspell.net/test/orig/batch0.tab.
+Copyright (C) 2002 Kevin Atkinson (kevina@gnu.org)
+
+Apache Commons IO
+Copyright 2002-2012 The Apache Software Foundation
+
+This product includes software developed by
+The Apache Software Foundation (http://www.apache.org/).
+
+Apache log4j
+Copyright 2010 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+Apache Commons Logging
+Copyright 2003-2014 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).

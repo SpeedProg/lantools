@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<shortcuts>
+	<skipIfNotSupported/>
+	<defaultCurrentUser/>
+	<programGroup defaultName="$APP_NAME" location="startMenu"/>
+	<shortcut name="LanTools.exe" target="$INSTALL_PATH/LanTools.exe" commandLine="" workingDirectory="$INSTALL_PATH/" description="" initialState="normal" programGroup="yes" desktop="yes" applications="no" startMenu="no" startup="no">
+		<createForPack name="LanTools.exe"/>
+	</shortcut>
+</shortcuts>
