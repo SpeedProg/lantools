@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="deploy" name="LanTools" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+<project default="build" name="LanTools" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+	<condition property="isWindows">
+		<os family="windows" />
+	</condition>
+	<condition property="isUnix">
+		<os family="unix" />
+	</condition>
 	<target name="create_jar">
 		<artifact:dependencies pathId="deps.runtime.path" filesetId="deps.fileset" scopes="system, compile">
 			<pom file="pom.xml" />
@@ -18,6 +24,7 @@
 		</jar>
 	</target>
 	<target name="compile">
+		<delete dir="./deploy/classes" />
 		<mkdir dir="./deploy/classes" />
 		<artifact:dependencies pathId="deps.compile.path" filesetId="deps.fileset" scopes="system, compile">
 			<pom file="pom.xml" />
@@ -26,6 +33,7 @@
 			<classpath refid="deps.compile.path" />
 		</javac>
 	</target>
+
 	<target name="deploy_deps">
 		<artifact:dependencies filesetId="deps.fileset" useScope="runtime">
 			<pom file="pom.xml" />
@@ -42,10 +50,11 @@
 			<fileset refid="deps.fileset" />
 			<fileset id="deps.system.fs" dir="./" includes="${deps.system.list}" />
 		</copy>
-
 	</target>
 
-	<target name="deploy" depends="compile, create_jar, deploy_deps, app_version_string">
+
+
+	<target name="deploy_files" depends="compile, create_jar, deploy_deps, app_version_string">
 		<copy file="./LICENSE" tofile="./deploy/app/LICENSE" />
 		<copy file="./NOTICE" tofile="./deploy/app/NOTICE" />
 		<copy todir="./deploy/installer">
@@ -64,11 +73,21 @@
 		<echo>Set installer version to ${app.version.string}</echo>
 	</target>
 
-	<target name="deploy_windows" depends="deploy">
+	<target name="installer_windows" depends="deploy_files" if="isWindows">
+		<echo>Creating installers on Windows</echo>
 		<exec executable="cmd.exe" dir="./deploy/installer">
 			<arg value="/c" />
 			<arg value="build_all.bat" />
 		</exec>
+	</target>
+
+	<target name="pack_nix" depends="deploy_files, app_version_string" if="isUnix">
+		<echo>Packing .tar.gz on Nix</echo>
+		<mkdir dir="./deploy/installer/out" />
+		<tar destfile="./deploy/installer/out/LanTools-${app.version.string}.tar.gz" basedir="./deploy/app/" compression="gzip" />
+	</target>
+
+	<target name="build" depends="deploy_files, installer_windows, pack_nix">
 	</target>
 
 	<!-- get version number from application -->
@@ -77,4 +96,9 @@
 			<arg line="-jar LanTools.jar --sversion" />
 		</exec>
 	</target>
+
+	<target name="clean">
+		<delete dir="./deploy" />
+	</target>
+
 </project>
