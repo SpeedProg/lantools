@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="deploy" name="LanTools" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+	<target name="create_jar">
+		<artifact:dependencies pathId="deps.runtime.path" filesetId="deps.fileset" scopes="system, compile">
+			<pom file="pom.xml" />
+		</artifact:dependencies>
+		<pathconvert property="mvnJars" refid="deps.runtime.path" pathsep=" ">
+			<mapper type="flatten" from="${dependency.versions}" to="flatten" />
+			<map from="" to="lib/" />
+		</pathconvert>
+		<property name="libJars" value="${mvnJars}" />
+		<jar destfile="./deploy/app/LanTools.jar">
+			<manifest>
+				<attribute name="Main-Class" value="de.speedprog.lantools.LanTools" />
+				<attribute name="Class-Path" value=". ${libJars}" />
+			</manifest>
+			<fileset dir="./deploy/classes" />
+		</jar>
+	</target>
+	<target name="compile">
+		<mkdir dir="./deploy/classes" />
+		<artifact:dependencies pathId="deps.compile.path" filesetId="deps.fileset" scopes="system, compile">
+			<pom file="pom.xml" />
+		</artifact:dependencies>
+		<javac srcdir="./src" destdir="./deploy/classes" includeAntRuntime="false" target="1.7">
+			<classpath refid="deps.compile.path" />
+		</javac>
+	</target>
+	<target name="deploy" depends="compile, create_jar">
+		<artifact:dependencies filesetId="deps.fileset" useScope="runtime">
+			<pom file="pom.xml" />
+		</artifact:dependencies>
+		<!-- system dependencys are not in the fileset -->
+		<artifact:dependencies pathId="deps.system.path" filesetId="deps.system.fileset" scopes="system">
+			<pom file="pom.xml" />
+		</artifact:dependencies>
+		<pathconvert refid="deps.system.path" property="deps.system.list" pathsep="," dirsep="/">
+			<map from="${basedir}/" to="" />
+		</pathconvert>
+		<!-- finished generating system deps, but they need to be in the ant dir -->
+		<copy todir="./deploy/app/html">
+			<fileset dir="./html" />
+		</copy>
+		<copy todir="./deploy/app/templates">
+			<fileset dir="./templates" />
+		</copy>
+		<copy file="./LICENSE" tofile="./deploy/app/LICENSE" />
+		<copy file="./NOTICE" tofile="./deploy/app/NOTICE" />
+		<copy todir="./deploy/installer">
+			<fileset dir="./installer" />
+		</copy>
+		<copy todir="./deploy/app/lib" flatten="true">
+			<fileset refid="deps.fileset" />
+			<fileset id="deps.system.fs" dir="./" includes="${deps.system.list}"/>
+		</copy>
+	</target>
+	<target name="deploy_windows" depends="deploy">
+		<exec executable="cmd.exe" dir="./deploy/installer">
+			<arg value="/c" />
+			<arg value="build_all.bat" />
+		</exec>
+	</target>
+</project>
