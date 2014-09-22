@@ -70,7 +70,7 @@ public class LanTools {
 
     public static void main(final String[] args) {
         if (args.length > 0) {
-            if (args[0].equals("--vstring")) {
+            if (args[0].equals("--sversion")) {
                 System.out.print(VERSION_STRING);
                 return;
             }

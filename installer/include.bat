@@ -1,5 +1,5 @@
 @echo off
-for /f %%i in ('java -jar ..\app\LanTools.jar --vstring') do set version=%%i
+for /f %%i in ('java -jar ..\app\LanTools.jar --sversion') do set version=%%i
 set out_dir=.\out
 set ins_jar=%out_dir%\LanTools-%version%-installer.jar
 set ins_exe=%out_dir%\LanTools-%version%-installer.exe
