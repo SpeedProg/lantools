@@ -78,5 +78,9 @@
 			<description>templates</description>
 			<file src="..\app\templates" targetdir="$INSTALL_PATH/" override="true"/>
 		</pack>
+		<pack name="deps" required="yes" preselected="yes" hidden="false">
+			<description>dependencys</description>
+			<file src="..\app\lib" targetdir="$INSTALL_PATH/" override="true"/>
+		</pack>
 	</packs>
 </installation>
