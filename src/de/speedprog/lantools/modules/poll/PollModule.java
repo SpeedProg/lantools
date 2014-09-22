@@ -87,7 +87,12 @@ public class PollModule implements Module, Container {
         if (serializeFile.exists()) {
             try {
                 ois = new ObjectInputStream(new FileInputStream(serializeFile));
-                pollMap = (Map<UUID, WebPoll>) ois.readObject();
+                final Object dsObject = ois.readObject();
+                if (dsObject instanceof Map<?, ?>) {
+                    @SuppressWarnings("unchecked")
+                    final Map<UUID, WebPoll> pollMap = (Map<UUID, WebPoll>) dsObject;
+                    this.pollMap = pollMap;
+                }
             } catch (final IOException | ClassNotFoundException e1) {
                 e1.printStackTrace();
             } finally {
