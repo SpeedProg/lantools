@@ -26,7 +26,7 @@
 			<classpath refid="deps.compile.path" />
 		</javac>
 	</target>
-	<target name="deploy" depends="compile, create_jar">
+	<target name="deploy_deps">
 		<artifact:dependencies filesetId="deps.fileset" useScope="runtime">
 			<pom file="pom.xml" />
 		</artifact:dependencies>
@@ -38,26 +38,43 @@
 			<map from="${basedir}/" to="" />
 		</pathconvert>
 		<!-- finished generating system deps, but they need to be in the ant dir -->
+		<copy todir="./deploy/app/lib" flatten="true">
+			<fileset refid="deps.fileset" />
+			<fileset id="deps.system.fs" dir="./" includes="${deps.system.list}" />
+		</copy>
+
+	</target>
+
+	<target name="deploy" depends="compile, create_jar, deploy_deps, app_version_string">
+		<copy file="./LICENSE" tofile="./deploy/app/LICENSE" />
+		<copy file="./NOTICE" tofile="./deploy/app/NOTICE" />
+		<copy todir="./deploy/installer">
+			<fileset dir="./installer" />
+		</copy>
 		<copy todir="./deploy/app/html">
 			<fileset dir="./html" />
 		</copy>
 		<copy todir="./deploy/app/templates">
 			<fileset dir="./templates" />
 		</copy>
-		<copy file="./LICENSE" tofile="./deploy/app/LICENSE" />
-		<copy file="./NOTICE" tofile="./deploy/app/NOTICE" />
-		<copy todir="./deploy/installer">
-			<fileset dir="./installer" />
-		</copy>
-		<copy todir="./deploy/app/lib" flatten="true">
-			<fileset refid="deps.fileset" />
-			<fileset id="deps.system.fs" dir="./" includes="${deps.system.list}"/>
-		</copy>
+		<!-- modify installer script to contain the version number -->
+		<!-- %version.string% replace with version -->
+
+		<replace file="./deploy/installer/izpack_installer.xml" token="%version.string%" value="${app.version.string}" />
+		<echo>Set installer version to ${app.version.string}</echo>
 	</target>
+
 	<target name="deploy_windows" depends="deploy">
 		<exec executable="cmd.exe" dir="./deploy/installer">
 			<arg value="/c" />
 			<arg value="build_all.bat" />
+		</exec>
+	</target>
+
+	<!-- get version number from application -->
+	<target name="app_version_string" depends="compile, create_jar, deploy_deps">
+		<exec executable="java" dir="./deploy/app" outputproperty="app.version.string">
+			<arg line="-jar LanTools.jar --sversion" />
 		</exec>
 	</target>
 </project>

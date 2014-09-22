@@ -2,7 +2,7 @@
 <installation version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xi="http://www.w3.org/2001/XInclude">
 	<info>
 		<appname>LanTools</appname>
-		<appversion>1.0.0-RC2</appversion>
+		<appversion>%version.string%</appversion>
 		<authors>
 			<author name="Constantin Wenger aka SpeedProg" email="constantin.wenger@googlemail.com"/>
 		</authors>
