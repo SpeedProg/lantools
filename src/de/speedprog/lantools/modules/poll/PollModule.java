@@ -45,17 +45,18 @@ import org.simpleframework.http.Part;
 import org.simpleframework.http.Path;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
-import org.simpleframework.http.core.Container;
 
 import de.speedprog.lantools.LanTools;
 import de.speedprog.lantools.modules.Module;
+import de.speedprog.lantools.modules.ModuleContainer;
 import de.speedprog.lantools.modules.datamodel.MenuModel;
 import de.speedprog.lantools.modules.poll.freenmaker.FMPoll;
+import de.speedprog.lantools.webserver.user.User;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
-public class PollModule implements Module, Container {
+public class PollModule implements Module, ModuleContainer {
     private static final String BASE_PATH = "/poll";
     private static final String NAME = "Poll";
     private static final String PAR_ACTION = "action";
@@ -118,7 +119,7 @@ public class PollModule implements Module, Container {
     }
 
     @Override
-    public Container getContainer() {
+    public ModuleContainer getModuleContainer() {
         // TODO Auto-generated method stub
         return this;
     }
@@ -147,7 +148,8 @@ public class PollModule implements Module, Container {
     }
 
     @Override
-    public void handle(final Request request, final Response response) {
+    public void handle(final Request request, final Response response,
+            final User user) {
         final Path path = request.getPath();
         final String pathString = path.toString();
         if (!pathString.startsWith(BASE_PATH)) {
@@ -227,7 +229,7 @@ public class PollModule implements Module, Container {
                         getFmPolls(pollMap.values(), request.getClientAddress()
                                 .getAddress()));
             }
-                break;
+            break;
             case ACTION_VOTE_FORM: {
                 String pollID;
                 try {
@@ -266,7 +268,7 @@ public class PollModule implements Module, Container {
                     return;
                 }
             }
-                break;
+            break;
             case ACTION_VOTE: {
                 Form form;
                 try {
@@ -352,7 +354,7 @@ public class PollModule implements Module, Container {
                     return;
                 }
             }
-                break;
+            break;
             case ACTION_RESULT: {
                 String pollIDString;
                 try {
@@ -378,7 +380,7 @@ public class PollModule implements Module, Container {
                     return;
                 }
             }
-                break;
+            break;
             case ACTION_POLL_FORM: {
                 response.set("Content-Type", "text/html");
                 try {
@@ -393,7 +395,7 @@ public class PollModule implements Module, Container {
                 dataMap.put("action", BASE_PATH + "?" + PAR_ACTION + "="
                         + ACTION_CREATE_POLL);
             }
-                break;
+            break;
             case ACTION_CREATE_POLL: {
                 Form form;
                 try {
@@ -484,7 +486,7 @@ public class PollModule implements Module, Container {
                     return;
                 }
             }
-                break;
+            break;
             case ACTION_LIST:
             default: {
                 response.set("Content-Type", "text/html");
@@ -506,7 +508,7 @@ public class PollModule implements Module, Container {
             }
             }
         }
-            break;
+        break;
         default:
             sendError(response, "This Page does not exist!");
             return;

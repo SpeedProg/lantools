@@ -40,7 +40,6 @@ import org.simpleframework.http.Part;
 import org.simpleframework.http.Path;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
-import org.simpleframework.http.core.Container;
 
 import com.rometools.rome.feed.synd.SyndEnclosure;
 import com.rometools.rome.feed.synd.SyndEnclosureImpl;
@@ -54,12 +53,14 @@ import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 
 import de.speedprog.lantools.LanTools;
+import de.speedprog.lantools.modules.ModuleContainer;
 import de.speedprog.lantools.modules.datamodel.MenuModel;
 import de.speedprog.lantools.webserver.WebServer;
+import de.speedprog.lantools.webserver.user.User;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
-public class TorrentService implements Container {
+public class TorrentService implements ModuleContainer {
     private static final String SITE_ENC = "UTF-8";
     public static final String TORRENTLIST_URL = "/list";
     public static final String TORRENTLOAD_URL = "/load.torrent";
@@ -97,7 +98,8 @@ public class TorrentService implements Container {
     }
 
     @Override
-    public void handle(final Request req, final Response response) {
+    public void handle(final Request req, final Response response,
+            final User user) {
         try {
             OutputStream outputStream;
             try {

@@ -18,10 +18,9 @@ package de.speedprog.lantools.modules.torrent;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 
-import org.simpleframework.http.core.Container;
-
 import de.speedprog.lantools.LanTools;
 import de.speedprog.lantools.modules.Module;
+import de.speedprog.lantools.modules.ModuleContainer;
 import de.speedprog.lantools.modules.ModuleSettings;
 import de.speedprog.lantools.webserver.WebServer;
 
@@ -49,7 +48,7 @@ public class TorrentTrackerModule implements Module {
     }
 
     @Override
-    public Container getContainer() {
+    public ModuleContainer getModuleContainer() {
         // TODO Auto-generated method stub
         return torrentService;
     }

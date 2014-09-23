@@ -17,15 +17,17 @@ package de.speedprog.lantools.webserver;
 
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
-import org.simpleframework.http.core.Container;
 
-public class NamedContainer implements Container {
+import de.speedprog.lantools.modules.ModuleContainer;
+import de.speedprog.lantools.webserver.user.User;
+
+public class NamedModuleContainer implements ModuleContainer {
     private final String name;
-    private final Container container;
+    private final ModuleContainer container;
     private final String basePath;
 
-    public NamedContainer(final String n, final Container container,
-            final String bPath) {
+    public NamedModuleContainer(final String n,
+            final ModuleContainer container, final String bPath) {
         if (container == null || n == null) {
             throw new IllegalArgumentException("");
         }
@@ -38,7 +40,7 @@ public class NamedContainer implements Container {
         return basePath;
     }
 
-    public Container getContainer() {
+    public ModuleContainer getModuleContainer() {
         return container;
     }
 
@@ -47,7 +49,8 @@ public class NamedContainer implements Container {
     }
 
     @Override
-    public void handle(final Request req, final Response resp) {
-        container.handle(req, resp);
+    public void handle(final Request request, final Response response,
+            final User user) {
+        container.handle(request, response, user);
     }
 }
