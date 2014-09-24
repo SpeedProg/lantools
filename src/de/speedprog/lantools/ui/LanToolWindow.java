@@ -47,6 +47,7 @@ import de.speedprog.lantools.LanTools;
 import de.speedprog.lantools.modules.Module;
 import de.speedprog.lantools.modules.ModuleContainer;
 import de.speedprog.lantools.modules.about.AboutModule;
+import de.speedprog.lantools.modules.notices.NoticesModule;
 import de.speedprog.lantools.modules.poll.PollModule;
 import de.speedprog.lantools.modules.torrent.TorrentTrackerModule;
 import de.speedprog.lantools.webserver.StartWebserverActionListener;
@@ -96,7 +97,7 @@ public class LanToolWindow {
         btnStartWebserver.addActionListener(new StartWebserverActionListener(
                 webServer, ftfWebPort, textFieldWebServerHostName));
         btnStartWebserver
-        .setActionCommand(StartWebserverActionListener.AC_START);
+                .setActionCommand(StartWebserverActionListener.AC_START);
         frmLantorrenttracker.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
@@ -126,6 +127,7 @@ public class LanToolWindow {
         modules.add(new TorrentTrackerModule(webServer));
         modules.add(new PollModule());
         modules.add(new AboutModule());
+        modules.add(new NoticesModule(null));
         return modules;
     }
 

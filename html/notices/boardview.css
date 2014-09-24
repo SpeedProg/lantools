@@ -1,0 +1,27 @@
+.notice-board {
+	border-bottom-left-radius: 2em;
+	border-bottom-right-radius: 2em;
+	border-top-right-radius: 1em;
+	border-top-left-radius: 1em;
+	display: inline-block;
+	border: solid;
+	width: 200px;
+	min-height: 100px;
+	padding-bottom: 3em;
+	overflow: hidden;
+	transition: 1s ease-in-out;
+}
+
+.notice-board:hover {
+	transform: scale(1.5);
+}
+
+.notice-board-head {
+	border-bottom: solid;
+	text-align: center;
+}
+
+.notice-board-body {
+	height: 90%;
+	text-align: left;
+}

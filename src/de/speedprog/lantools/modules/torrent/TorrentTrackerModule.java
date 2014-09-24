@@ -27,7 +27,7 @@ import de.speedprog.lantools.webserver.WebServer;
 public class TorrentTrackerModule implements Module {
     protected static final String SETTING_TRACKERPORT = "tracker_port";
     protected static final String SETTING_TRACKERHOST = "tracker_host";
-    private static final String BASE_PATH = "/tracker";
+    private static final String BASE_PATH = "/tracker/";
     private static final String TAB_NAME = "Torrent Tracker";
     private final TorrentPanel torrentPanel;
     private final WebServer webServer;
@@ -48,15 +48,15 @@ public class TorrentTrackerModule implements Module {
     }
 
     @Override
-    public ModuleContainer getModuleContainer() {
-        // TODO Auto-generated method stub
-        return torrentService;
-    }
-
-    @Override
     public Icon getIcon() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public ModuleContainer getModuleContainer() {
+        // TODO Auto-generated method stub
+        return torrentService;
     }
 
     @Override

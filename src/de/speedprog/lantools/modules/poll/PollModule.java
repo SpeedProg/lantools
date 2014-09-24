@@ -57,7 +57,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 public class PollModule implements Module, ModuleContainer {
-    private static final String BASE_PATH = "/poll";
+    private static final String BASE_PATH = "/poll/";
     private static final String NAME = "Poll";
     private static final String PAR_ACTION = "action";
     private static final String ACTION_DELETE = "delete";
@@ -119,15 +119,15 @@ public class PollModule implements Module, ModuleContainer {
     }
 
     @Override
-    public ModuleContainer getModuleContainer() {
-        // TODO Auto-generated method stub
-        return this;
-    }
-
-    @Override
     public Icon getIcon() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public ModuleContainer getModuleContainer() {
+        // TODO Auto-generated method stub
+        return this;
     }
 
     @Override
@@ -229,7 +229,7 @@ public class PollModule implements Module, ModuleContainer {
                         getFmPolls(pollMap.values(), request.getClientAddress()
                                 .getAddress()));
             }
-            break;
+                break;
             case ACTION_VOTE_FORM: {
                 String pollID;
                 try {
@@ -268,7 +268,7 @@ public class PollModule implements Module, ModuleContainer {
                     return;
                 }
             }
-            break;
+                break;
             case ACTION_VOTE: {
                 Form form;
                 try {
@@ -354,7 +354,7 @@ public class PollModule implements Module, ModuleContainer {
                     return;
                 }
             }
-            break;
+                break;
             case ACTION_RESULT: {
                 String pollIDString;
                 try {
@@ -380,7 +380,7 @@ public class PollModule implements Module, ModuleContainer {
                     return;
                 }
             }
-            break;
+                break;
             case ACTION_POLL_FORM: {
                 response.set("Content-Type", "text/html");
                 try {
@@ -395,7 +395,7 @@ public class PollModule implements Module, ModuleContainer {
                 dataMap.put("action", BASE_PATH + "?" + PAR_ACTION + "="
                         + ACTION_CREATE_POLL);
             }
-            break;
+                break;
             case ACTION_CREATE_POLL: {
                 Form form;
                 try {
@@ -486,7 +486,7 @@ public class PollModule implements Module, ModuleContainer {
                     return;
                 }
             }
-            break;
+                break;
             case ACTION_LIST:
             default: {
                 response.set("Content-Type", "text/html");
@@ -508,7 +508,7 @@ public class PollModule implements Module, ModuleContainer {
             }
             }
         }
-        break;
+            break;
         default:
             sendError(response, "This Page does not exist!");
             return;
