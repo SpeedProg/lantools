@@ -36,7 +36,6 @@ public class NoticesContainer implements ModuleContainer {
     private static final Logger LOGGER = Logger
             .getLogger(NoticesContainer.class.getName());
     private final List<Map<String, String>> menuData;
-    private boolean generated;
 
     public NoticesContainer(final String basePath) {
         this.boardMap = new ConcurrentHashMap<>();
@@ -45,31 +44,14 @@ public class NoticesContainer implements ModuleContainer {
         menuModel.addLink("Home", "/");
         menuModel.addLink("Notice Boards", basePath);
         this.menuData = menuModel.getMenuModel();
-        this.generated = false;
     }
 
     @Override
     public void handle(final Request request, final Response response,
             final User user) {
         try {
-            System.out.println("Notices Container!");
-            if (!generated) {
-                for (int i = 0; i < 10; i++) {
-                    final NoticeBoard board = new NoticeBoard(user,
-                            "Test " + i, "Desc " + i);
-                    for (int n = 0; n < 10; n++) {
-                        final BoardEntry entry = new BoardEntry(user,
-                                "Entry Title: " + n, "Entry Content " + n);
-                        board.addBoardEntry(entry);
-                    }
-                    boardMap.put(board.getId(), board);
-                }
-                generated = true;
-            }
-            System.out.println("Get Paths!");
             final Path path = request.getPath();
             final String pathString = path.getDirectory();
-            System.out.println("Path String: " + pathString);
             if (!pathString.startsWith(basePath)) {
                 return;
             }
@@ -80,15 +62,12 @@ public class NoticesContainer implements ModuleContainer {
                 relPathString = pathString.substring(basePath.length(),
                         pathString.length() - 1);
             }
-            System.out.println("RelPath: " + relPathString);
             // we make this one param based
             if (relPathString.equals("/")) {
                 String action = null;
                 try {
                     action = request.getParameter(PARAM_ACTION);
                 } catch (final IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
                     sendInternalServerError(response, e);
                     return;
                 }
@@ -103,7 +82,6 @@ public class NoticesContainer implements ModuleContainer {
                 data.put("a_new_board", ACTION_NEW_BOARD);
                 data.put("a_new_notice", ACTION_NEW_NOTICE);
                 if (action == null) {
-                    System.out.println("Action is null");
                     handleBoardListView(request, response, user, data);
                     return;
                 } else {
@@ -124,8 +102,8 @@ public class NoticesContainer implements ModuleContainer {
                         try {
                             response.close();
                         } catch (final IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                            LOGGER.log(Level.SEVERE,
+                                    "Error sending notimplemted code.", e);
                         }
                         break;
                     }
@@ -138,8 +116,6 @@ public class NoticesContainer implements ModuleContainer {
                 try {
                     response.close();
                 } catch (final IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
                     sendInternalServerError(response, e);
                     return;
                 }
@@ -295,8 +271,6 @@ public class NoticesContainer implements ModuleContainer {
         try {
             response.close();
         } catch (final IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
             LOGGER.log(Level.SEVERE, "Error sending internal server error.", e);
         }
     }
