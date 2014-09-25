@@ -2,11 +2,11 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<#include "style.ftl">
+<#include "/style.ftl">
 <title>Voted</title>
-<#include "jquery.ftl">
+<#include "/jquery.ftl">
 </head>
-<#include "bodystart.ftl">
+<#include "/bodystart.ftl">
 <#include "/menu.ftl">
 <h2>Existing Modules:</h2>
 <div class="pure-menu pure-menu-open">

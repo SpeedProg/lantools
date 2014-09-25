@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UserMapper {
-    private final Map<InetAddress, User> inetToUserMap;
+    private final Map<InetAddress, UserImpl> inetToUserMap;
     private final Map<String, InetAddress> nameToInetMap;
 
     public UserMapper() {
@@ -25,7 +25,7 @@ public class UserMapper {
      */
     public synchronized boolean changeUsername(final InetAddress address,
             final String newname) {
-        final User user = inetToUserMap.get(address);
+        final UserImpl user = inetToUserMap.get(address);
         if (user == null) { // contains user for the address
             return false;
         }
@@ -34,6 +34,11 @@ public class UserMapper {
         }
         user.setUsername(newname);
         return true;
+    }
+
+    public synchronized void clearUsers() {
+        nameToInetMap.clear();
+        inetToUserMap.clear();
     }
 
     /**
@@ -76,13 +81,15 @@ public class UserMapper {
                 || nameToInetMap.containsKey(username)) {
             return false;
         }
-        final User user = new User(username, address);
+        final User user = new UserImpl(username, address);
         addUser(user);
         return true;
     }
 
     private void addUser(final User user) {
-        inetToUserMap.put(user.getInetAddress(), user);
+        final UserImpl userImpl = new UserImpl(user.getUsername(),
+                user.getInetAddress());
+        inetToUserMap.put(user.getInetAddress(), userImpl);
         nameToInetMap.put(user.getUsername(), user.getInetAddress());
     }
 }

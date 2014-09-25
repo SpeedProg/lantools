@@ -24,7 +24,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -72,6 +71,7 @@ public class PollModule implements Module, ModuleContainer {
     private final List<Map<String, String>> menuData;
     private final File serializeFile;
     private final String basePath;
+    private final java.nio.file.Path cfgPath;
 
     public PollModule(final String basePath) {
         if (basePath == null) {
@@ -79,20 +79,22 @@ public class PollModule implements Module, ModuleContainer {
         } else {
             this.basePath = basePath;
         }
+        cfgPath = LanTools.getModuleConfigPath(this.basePath);
         final MenuModel menuModel = new MenuModel();
         menuModel.addLink("Home", "/");
         menuModel.addLink("Polls", this.basePath);
         menuModel.addLink("Create Poll", this.basePath + "?" + PAR_ACTION + "="
                 + ACTION_POLL_FORM);
-        menuData = menuModel.getMenuModel();
-        cfg = LanTools.getFreeMakerConfig();
+        this.menuData = menuModel.getMenuModel();
+        this.cfg = LanTools.getFreeMakerConfig();
         new PollPanel();
-        serializeFile = new File(".", "polls.obj");
-        pollMap = null;
+        this.serializeFile = cfgPath.resolve("polls.obj").toFile();
+        this.pollMap = null;
         ObjectInputStream ois = null;
-        if (serializeFile.exists()) {
+        if (this.serializeFile.exists()) {
             try {
-                ois = new ObjectInputStream(new FileInputStream(serializeFile));
+                ois = new ObjectInputStream(new FileInputStream(
+                        this.serializeFile));
                 final Object dsObject = ois.readObject();
                 if (dsObject instanceof Map<?, ?>) {
                     @SuppressWarnings("unchecked")
@@ -112,8 +114,9 @@ public class PollModule implements Module, ModuleContainer {
                 }
             }
         }
-        if (pollMap == null) {
-            pollMap = Collections.synchronizedMap(new HashMap<UUID, WebPoll>());
+        if (this.pollMap == null) {
+            this.pollMap = Collections
+                    .synchronizedMap(new HashMap<UUID, WebPoll>());
         }
     }
 
@@ -123,13 +126,13 @@ public class PollModule implements Module, ModuleContainer {
     }
 
     @Override
-    public ModuleContainer getModuleContainer() {
-        return this;
+    public Icon getIcon() {
+        return null;
     }
 
     @Override
-    public Icon getIcon() {
-        return null;
+    public ModuleContainer getModuleContainer() {
+        return this;
     }
 
     @Override
@@ -215,8 +218,7 @@ public class PollModule implements Module, ModuleContainer {
                     sendError(response, "Could not load Template.");
                     return;
                 }
-                if (!poll.getOwnerAddress().equals(
-                        request.getClientAddress().getAddress())) {
+                if (!poll.getOwner().equals(user)) {
                     dataMap.put("msg",
                             "You are not allowed to delete this vote, only the creator can delte votes!");
                     break;
@@ -224,12 +226,9 @@ public class PollModule implements Module, ModuleContainer {
                 final WebPoll webPoll = pollMap.remove(poll.getUuid());
                 dataMap.put("msg", "Poll " + webPoll.getUuid().toString()
                         + " deleted.");
-                dataMap.put(
-                        "polls",
-                        getFmPolls(pollMap.values(), request.getClientAddress()
-                                .getAddress()));
+                dataMap.put("polls", getFmPolls(pollMap.values(), user));
             }
-            break;
+                break;
             case ACTION_VOTE_FORM: {
                 String pollID;
                 try {
@@ -251,9 +250,7 @@ public class PollModule implements Module, ModuleContainer {
                     sendError(response, "Poll ID invalid");
                     return;
                 }
-                dataMap.put(
-                        "poll",
-                        getFmPoll(poll, request.getClientAddress().getAddress()));
+                dataMap.put("poll", getFmPoll(poll, user));
                 final List<PollOption> options = new LinkedList<>();
                 options.addAll(poll.getOptions());
                 dataMap.put("action", basePath + "?action=" + ACTION_VOTE
@@ -268,7 +265,7 @@ public class PollModule implements Module, ModuleContainer {
                     return;
                 }
             }
-            break;
+                break;
             case ACTION_VOTE: {
                 Form form;
                 try {
@@ -338,12 +335,9 @@ public class PollModule implements Module, ModuleContainer {
                         }
                     }
                 }
-                poll.vote(request.getClientAddress().getAddress(),
-                        optionNameSet);
+                poll.vote(user, optionNameSet);
                 savePollDataAsync();
-                dataMap.put(
-                        "poll",
-                        getFmPoll(poll, request.getClientAddress().getAddress()));
+                dataMap.put("poll", getFmPoll(poll, user));
                 try {
                     template = cfg.getTemplate("poll" + File.separator
                             + "poll_voted.ftl");
@@ -354,7 +348,7 @@ public class PollModule implements Module, ModuleContainer {
                     return;
                 }
             }
-            break;
+                break;
             case ACTION_RESULT: {
                 String pollIDString;
                 try {
@@ -367,9 +361,7 @@ public class PollModule implements Module, ModuleContainer {
                 }
                 final UUID pollID = UUID.fromString(pollIDString);
                 final WebPoll poll = pollMap.get(pollID);
-                dataMap.put(
-                        "poll",
-                        getFmPoll(poll, request.getClientAddress().getAddress()));
+                dataMap.put("poll", getFmPoll(poll, user));
                 try {
                     template = cfg.getTemplate("poll" + File.separator
                             + "poll_result.ftl");
@@ -380,7 +372,7 @@ public class PollModule implements Module, ModuleContainer {
                     return;
                 }
             }
-            break;
+                break;
             case ACTION_POLL_FORM: {
                 response.set("Content-Type", "text/html");
                 try {
@@ -395,7 +387,7 @@ public class PollModule implements Module, ModuleContainer {
                 dataMap.put("action", basePath + "?" + PAR_ACTION + "="
                         + ACTION_CREATE_POLL);
             }
-            break;
+                break;
             case ACTION_CREATE_POLL: {
                 Form form;
                 try {
@@ -456,7 +448,7 @@ public class PollModule implements Module, ModuleContainer {
                 try {
                     webPoll = new WebPoll(question, enableIpFilter,
                             Pattern.compile(ipfilter), oneVotePerIp, votes,
-                            request.getClientAddress().getAddress(), id);
+                            user, id);
                 } catch (final PatternSyntaxException e) {
                     sendError(response, "IP-Filter Pattern had a syntax error!");
                     return;
@@ -467,15 +459,9 @@ public class PollModule implements Module, ModuleContainer {
                 pollMap.put(id, webPoll);
                 savePollDataAsync();
                 synchronized (pollMap) {
-                    dataMap.put(
-                            "polls",
-                            getFmPolls(pollMap.values(), request
-                                    .getClientAddress().getAddress()));
+                    dataMap.put("polls", getFmPolls(pollMap.values(), user));
                 }
-                dataMap.put(
-                        "createdpoll",
-                        getFmPoll(webPoll, request.getClientAddress()
-                                .getAddress()));
+                dataMap.put("createdpoll", getFmPoll(webPoll, user));
                 try {
                     template = cfg.getTemplate("poll" + File.separator
                             + "poll_created.ftl");
@@ -486,7 +472,7 @@ public class PollModule implements Module, ModuleContainer {
                     return;
                 }
             }
-            break;
+                break;
             case ACTION_LIST:
             default: {
                 response.set("Content-Type", "text/html");
@@ -500,15 +486,12 @@ public class PollModule implements Module, ModuleContainer {
                     return;
                 }
                 synchronized (pollMap) {
-                    dataMap.put(
-                            "polls",
-                            getFmPolls(pollMap.values(), request
-                                    .getClientAddress().getAddress()));
+                    dataMap.put("polls", getFmPolls(pollMap.values(), user));
                 }
             }
             }
         }
-        break;
+            break;
         default:
             sendError(response, "This Page does not exist!");
             return;
@@ -548,16 +531,21 @@ public class PollModule implements Module, ModuleContainer {
         savePollData();
     }
 
-    private FMPoll getFmPoll(final WebPoll poll, final InetAddress address) {
-        return FMPoll.createFromWebPoll(poll, address, basePath + "?"
+    @Override
+    public void usersCleared() {
+        pollMap.clear();
+    }
+
+    private FMPoll getFmPoll(final WebPoll poll, final User cUser) {
+        return FMPoll.createFromWebPoll(poll, cUser, basePath + "?"
                 + PAR_ACTION + "=" + ACTION_VOTE_FORM + "&poll=", basePath
                 + "?" + PAR_ACTION + "=" + ACTION_RESULT + "&poll=", basePath
                 + "?" + PAR_ACTION + "=" + ACTION_DELETE + "&poll=");
     }
 
     private List<FMPoll> getFmPolls(final Collection<WebPoll> polls,
-            final InetAddress address) {
-        return FMPoll.createFromWebPoll(polls, address, basePath + "?"
+            final User cUser) {
+        return FMPoll.createFromWebPoll(polls, cUser, basePath + "?"
                 + PAR_ACTION + "=" + ACTION_VOTE_FORM + "&poll=", basePath
                 + "?" + PAR_ACTION + "=" + ACTION_RESULT + "&poll=", basePath
                 + "?" + PAR_ACTION + "=" + ACTION_DELETE + "&poll=");

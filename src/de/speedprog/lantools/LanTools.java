@@ -17,6 +17,8 @@ package de.speedprog.lantools;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.SwingUtilities;
 
@@ -53,6 +55,21 @@ public class LanTools {
         }
     }
 
+    public static Path getModuleConfigPath(final String basePath) {
+        final Path modulePath = CFG_PATH.resolve(basePath.replace('/',
+                File.separatorChar).substring(1));
+        final File cfgFile = modulePath.toFile();
+        if (cfgFile.exists()) {
+            if (!cfgFile.isDirectory()) {
+                cfgFile.delete();
+                cfgFile.mkdirs();
+            }
+        } else {
+            cfgFile.mkdirs();
+        }
+        return modulePath;
+    }
+
     public static Settings getSettings() {
         return SETTINGS;
     }
@@ -69,6 +86,7 @@ public class LanTools {
     }
 
     public static void main(final String[] args) {
+        prepareForStart();
         if (args.length > 0) {
             if (args[0].equals("--sversion")) {
                 System.out.print(VERSION_STRING);
@@ -97,11 +115,24 @@ public class LanTools {
         }));
     }
 
+    private static void prepareForStart() {
+        final File cfgFile = CFG_PATH.toFile();
+        if (cfgFile.exists()) {
+            if (!cfgFile.isDirectory()) {
+                cfgFile.delete();
+                cfgFile.mkdirs();
+            }
+        } else {
+            cfgFile.mkdirs();
+        }
+    }
+
+    private static final Path CFG_PATH = Paths.get(".", "cfg");
     public static final String VERSION_STRING = "1.0.0-RC3";
     public static final Integer VERSION_NUM = 5;
     private static Configuration CFG = null;
-    private static final Settings SETTINGS = new Settings("." + File.separator
-            + "settings.xml");
+    private static final Settings SETTINGS = new Settings(getModuleConfigPath(
+            "/").resolve("settings.xml").toString());
 
     private LanTools() {
     }

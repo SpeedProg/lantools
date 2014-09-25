@@ -51,15 +51,15 @@ public class TorrentTrackerModule implements Module {
     }
 
     @Override
-    public ModuleContainer getModuleContainer() {
-        // TODO Auto-generated method stub
-        return torrentService;
-    }
-
-    @Override
     public Icon getIcon() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public ModuleContainer getModuleContainer() {
+        // TODO Auto-generated method stub
+        return torrentService;
     }
 
     @Override
@@ -82,5 +82,9 @@ public class TorrentTrackerModule implements Module {
     public void onClose() {
         final ModuleSettings moduleSettings = LanTools.getSettingsFor(basePath);
         torrentPanel.onClose(moduleSettings);
+    }
+
+    @Override
+    public void usersCleared() {
     }
 }

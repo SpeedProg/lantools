@@ -310,7 +310,7 @@ public class TorrentService implements ModuleContainer {
                     output.output(feed, new OutputStreamWriter(outputStream));
                     response.close();
                 }
-                return;
+                    return;
                 default:
                     template = CFG.getTemplate("error.ftl");
                     dataMap.put("errormsg", "No valid page!");

@@ -1,6 +1,5 @@
 package de.speedprog.lantools.modules.poll.freenmaker;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -9,6 +8,7 @@ import java.util.UUID;
 
 import de.speedprog.lantools.modules.poll.PollOption;
 import de.speedprog.lantools.modules.poll.WebPoll;
+import de.speedprog.lantools.webserver.user.User;
 
 public class FMPoll {
     /**
@@ -16,22 +16,20 @@ public class FMPoll {
      * template.
      *
      * @param polls
-     *
-     * @param poll
-     * @param currentAddress
+     * @param cUser
      * @param vote
      * @param result
      * @param delete
      * @return
      */
     public static List<FMPoll> createFromWebPoll(
-            final Collection<WebPoll> polls, final InetAddress currentAddress,
+            final Collection<WebPoll> polls, final User cUser,
             final String vote, final String result, final String delete) {
         final List<FMPoll> fmPolls = new ArrayList<>(polls.size());
-        for (final Iterator iterator = polls.iterator(); iterator.hasNext();) {
-            final WebPoll poll = (WebPoll) iterator.next();
-            fmPolls.add(createFromWebPoll(poll, currentAddress, vote, result,
-                    delete));
+        for (final Iterator<WebPoll> iterator = polls.iterator(); iterator
+                .hasNext();) {
+            final WebPoll poll = iterator.next();
+            fmPolls.add(createFromWebPoll(poll, cUser, vote, result, delete));
         }
         return fmPolls;
     }
@@ -40,19 +38,19 @@ public class FMPoll {
      * Creates a FMPoll from a WebPoll for use in a freemaker template.
      *
      * @param poll
-     * @param currentAddress
+     * @param cUser
      * @param vote
      * @param result
      * @param delete
      * @return
      */
     public static FMPoll createFromWebPoll(final WebPoll poll,
-            final InetAddress currentAddress, final String vote,
-            final String result, final String delete) {
+            final User cUser, final String vote, final String result,
+            final String delete) {
         return new FMPoll(poll.getQuestion(), poll.getOptions(), poll
-                .getOwnerAddress().equals(currentAddress), poll.getUuid(),
-                poll.getRestriction(currentAddress), poll.getVotes(), vote,
-                result, delete);
+                .getOwner().equals(cUser), poll.getUuid(),
+                poll.getRestriction(cUser), poll.getVotes(), vote, result,
+                delete);
     }
 
     private final String question;
