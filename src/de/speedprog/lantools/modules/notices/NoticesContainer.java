@@ -28,6 +28,7 @@ public class NoticesContainer implements ModuleContainer {
     private final String basePath;
     private static final String PARAM_ACTION = "action";
     private static final String ACTION_SHOW_BOARD = "board";
+    private static final String ACTION_NEW_BOARD = "newboard";
     private static final Configuration CFG = LanTools.getFreeMakerConfig();
     private static final Logger LOGGER = Logger
             .getLogger(NoticesContainer.class.getName());
@@ -90,9 +91,12 @@ public class NoticesContainer implements ModuleContainer {
                 }
                 final Template template = null;
                 final Map<String, Object> data = new HashMap<String, Object>();
+                data.put("basepath", basePath);
+                data.put("param_action", PARAM_ACTION);
                 data.put("menulinks", menuData);
                 data.put("user", user);
                 data.put("a_show_board", ACTION_SHOW_BOARD);
+                data.put("a_new_board", ACTION_NEW_BOARD);
                 if (action == null) {
                     System.out.println("Action is null");
                     handleBoardListView(request, response, user, data);
@@ -102,6 +106,9 @@ public class NoticesContainer implements ModuleContainer {
                     case ACTION_SHOW_BOARD:
                         System.out.println("Action Board view.");
                         handleBoardView(request, response, user, data);
+                        break;
+                    case ACTION_NEW_BOARD:
+                        handleBoardCreate(request, response, user, data);
                         break;
                     default:
                         response.setCode(Status.NOT_IMPLEMENTED.getCode());
@@ -132,6 +139,27 @@ public class NoticesContainer implements ModuleContainer {
         } catch (final Exception exception) {
             exception.printStackTrace();
         }
+    }
+
+    private void handleBoardCreate(final Request request,
+            final Response response, final User user,
+            final Map<String, Object> data) {
+        final org.simpleframework.http.Form form;
+        try {
+            form = request.getForm();
+        } catch (final IOException e) {
+            sendInternalServerError(response, e);
+            return;
+        }
+        final String boardName = form.get("name");
+        final String boardDesc = form.get("desc");
+        if (boardName == null || boardDesc == null) {
+            sendBadRequest(response);
+            return;
+        }
+        final NoticeBoard board = new NoticeBoard(user, boardName, boardDesc);
+        boardMap.put(board.getId(), board);
+        handleBoardListView(request, response, user, data); // show list of boards
     }
 
     private void handleBoardListView(final Request request,

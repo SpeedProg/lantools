@@ -17,21 +17,34 @@
     Board Count: ${boards?size}
     </div>
     <div class="notice-board-body">
-<#list boards as board>
-<div class="notice-board lantools-content" id="board-${board.id}">
-<a href="/notices/?action=${a_show_board}&boardid=${board.id}">
-<div class="notice-board-head lantools-header">
-${board.name}
-</div></a>
-<div class="lantools-subtitle">
-Owner: ${board.owner.username}
-</div>
-<div class="notice-board-body">
-${board.description}
-</div>
-</div>
-</#list>
+        <#list boards as board>
+        <div class="notice-board lantools-content" id="board-${board.id}">
+            <a href="/notices/?action=${a_show_board}&boardid=${board.id}">
+                <div class="notice-board-head lantools-header">
+                    ${board.name}
+                </div>
+            </a>
+            <div class="lantools-subtitle">
+                Owner: ${board.owner.username}
+            </div>
+            <div class="notice-board-body">
+                ${board.description}
+            </div>
+        </div>
+        </#list>
     </div>
 </div>
+<a href="#" id="showform" onClick="document.getElementById('newboardform').hidden=false;document.getElementById('showform').hidden=true;">Create new Board</a>
+<form id="newboardform" cass="pure-form pure-form-aligned" action="${basepath}?${param_action}=${a_new_board}" method="post" hidden>
+    <div class="pure-control-group">
+        <label for="name_input">Board Name:</label><input type="text" id="name_input" name="name"/>
+    </div>
+    <div class="pure-control-group">
+        <label for="desc_textarea">Description:</label><textarea placeholder="Description of the context of this Noticeboard. Max 500 chars." name="desc" maxlength="500"></textarea>
+    </div>
+    <div class="pure-control">
+        <button class="pure-button pure-button-primary" type="submit" name="submit">Submit</button>
+    </div>
+</form>
 </body>
 </html>
