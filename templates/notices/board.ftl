@@ -31,6 +31,18 @@ Owner: ${board.owner.username} Desc: ${board.description}
         </div>
         </#list>
     </div>
+    <a href="#" id="showform" onClick="document.getElementById('newboardform').hidden=false;document.getElementById('showform').hidden=true;">Add a Notice</a>
+    <form id="newboardform" cass="pure-form pure-form-aligned" action="${basepath}?${param_action}=${a_new_notice}&${param_boardid}=${board.id}" method="post" hidden>
+    <div class="pure-control-group">
+        <label for="name_input">Notice Title:</label><input type="text" id="title_input" name="title"/>
+    </div>
+    <div class="pure-control-group">
+        <label for="desc_textarea">Content:</label><textarea required rows="10" placeholder="Notice text..." name="content"></textarea>
+    </div>
+    <div class="pure-control">
+        <button class="pure-button pure-button-primary" type="submit">Submit</button>
+    </div>
+</form>
 </div>
 </body>
 </html>

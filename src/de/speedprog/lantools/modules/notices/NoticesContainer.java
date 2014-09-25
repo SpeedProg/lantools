@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.simpleframework.http.Form;
 import org.simpleframework.http.Path;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
@@ -27,8 +28,10 @@ public class NoticesContainer implements ModuleContainer {
     private final Map<UUID, NoticeBoard> boardMap;
     private final String basePath;
     private static final String PARAM_ACTION = "action";
+    private static final String PARAM_BOARDID = "boardid";
     private static final String ACTION_SHOW_BOARD = "board";
     private static final String ACTION_NEW_BOARD = "newboard";
+    private static final String ACTION_NEW_NOTICE = "newnotice";
     private static final Configuration CFG = LanTools.getFreeMakerConfig();
     private static final Logger LOGGER = Logger
             .getLogger(NoticesContainer.class.getName());
@@ -40,7 +43,7 @@ public class NoticesContainer implements ModuleContainer {
         this.basePath = basePath;
         final MenuModel menuModel = new MenuModel();
         menuModel.addLink("Home", "/");
-        menuModel.addLink("Overview", basePath);
+        menuModel.addLink("Notice Boards", basePath);
         this.menuData = menuModel.getMenuModel();
         this.generated = false;
     }
@@ -93,10 +96,12 @@ public class NoticesContainer implements ModuleContainer {
                 final Map<String, Object> data = new HashMap<String, Object>();
                 data.put("basepath", basePath);
                 data.put("param_action", PARAM_ACTION);
+                data.put("param_boardid", PARAM_BOARDID);
                 data.put("menulinks", menuData);
                 data.put("user", user);
                 data.put("a_show_board", ACTION_SHOW_BOARD);
                 data.put("a_new_board", ACTION_NEW_BOARD);
+                data.put("a_new_notice", ACTION_NEW_NOTICE);
                 if (action == null) {
                     System.out.println("Action is null");
                     handleBoardListView(request, response, user, data);
@@ -109,6 +114,9 @@ public class NoticesContainer implements ModuleContainer {
                         break;
                     case ACTION_NEW_BOARD:
                         handleBoardCreate(request, response, user, data);
+                        break;
+                    case ACTION_NEW_NOTICE:
+                        handleNoticeCreate(request, response, user, data);
                         break;
                     default:
                         response.setCode(Status.NOT_IMPLEMENTED.getCode());
@@ -210,6 +218,41 @@ public class NoticesContainer implements ModuleContainer {
         }
         process(template, data, response);
         return;
+    }
+
+    private void handleNoticeCreate(final Request request,
+            final Response response, final User user,
+            final Map<String, Object> data) {
+        Form form;
+        try {
+            form = request.getForm();
+        } catch (final IOException e) {
+            sendInternalServerError(response, e);
+            return;
+        }
+        final String noticeTitle = form.get("title");
+        final String noticeContent = form.get("content");
+        final String boardIdString = form.get(PARAM_BOARDID);
+        if (noticeTitle == null || noticeContent == null
+                || boardIdString == null) {
+            sendBadRequest(response);
+            return;
+        }
+        UUID boardID;
+        try {
+            boardID = UUID.fromString(boardIdString);
+        } catch (final IllegalArgumentException e) {
+            sendBadRequest(response);
+            return;
+        }
+        final NoticeBoard board = boardMap.get(boardID);
+        if (board == null) {
+            sendBadRequest(response);
+            return;
+        }
+        board.addBoardEntry(new BoardEntry(user, noticeTitle, noticeContent));
+        // we can do this since the param boardid is the same
+        handleBoardView(request, response, user, data);
     }
 
     private void process(final Template template,
