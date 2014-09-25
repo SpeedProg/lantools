@@ -8,6 +8,7 @@
 </head>
 <#include "/bodystart.ftl">
 <#include "/menu.ftl">
+<p>You need to map a Username to your ip. Please choose one :).</p>
 <form action="/" method="get" class="pure-form">
 <label for="username">Username:</label><input type="text" name="username" id="username"/>
 <button type="submit" type="submit" class="pure-button pure-button-primary">Submit</button>
