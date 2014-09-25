@@ -85,4 +85,8 @@ public class TorrentTrackerModule implements Module {
         final ModuleSettings moduleSettings = LanTools.getSettingsFor(basePath);
         torrentPanel.onClose(moduleSettings);
     }
+
+    @Override
+    public void usersCleared() {
+    }
 }

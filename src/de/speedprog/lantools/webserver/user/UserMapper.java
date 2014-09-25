@@ -36,6 +36,11 @@ public class UserMapper {
         return true;
     }
 
+    public synchronized void clearUsers() {
+        nameToInetMap.clear();
+        inetToUserMap.clear();
+    }
+
     /**
      * Get the address to the given name
      *

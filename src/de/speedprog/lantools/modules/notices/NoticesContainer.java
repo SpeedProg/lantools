@@ -185,6 +185,10 @@ public class NoticesContainer implements ModuleContainer {
         }
     }
 
+    public void usersCleared() {
+        boardMap.clear();
+    }
+
     private void handleBoardCreate(final Request request,
             final Response response, final User user,
             final Map<String, Object> data) {

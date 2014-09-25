@@ -17,6 +17,8 @@ package de.speedprog.lantools.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -66,6 +68,7 @@ public class LanToolWindow {
     private JTextField textFieldWebServerHostName;
     private final Settings settings;
     private final Collection<Module> modules;
+    private final JButton btnClearUsers;
 
     /**
      * Create the application.
@@ -98,6 +101,9 @@ public class LanToolWindow {
                 webServer, ftfWebPort, textFieldWebServerHostName));
         btnStartWebserver
         .setActionCommand(StartWebserverActionListener.AC_START);
+        btnClearUsers = new JButton("Clear Users");
+        btnClearUsers.addActionListener(new BtnClearUsersActionListener());
+        panelSettings.add(btnClearUsers, "6, 4");
         frmLantorrenttracker.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
@@ -184,5 +190,15 @@ public class LanToolWindow {
         textFieldWebServerHostName.setText(defWebHostString);
         panelSettings.add(textFieldWebServerHostName, "4, 4, fill, default");
         textFieldWebServerHostName.setColumns(10);
+    }
+
+    private class BtnClearUsersActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            webServer.clearUsers();
+            for (final Module module : modules) {
+                module.usersCleared();
+            }
+        }
     }
 }

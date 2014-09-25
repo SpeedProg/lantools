@@ -54,4 +54,9 @@ public class NoticesModule implements Module {
     public void onClose() {
         moduleContainer.close();
     }
+
+    @Override
+    public void usersCleared() {
+        moduleContainer.usersCleared();
+    }
 }

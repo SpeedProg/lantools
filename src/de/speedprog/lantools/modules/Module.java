@@ -60,4 +60,6 @@ public interface Module {
     public String getTip();
 
     public void onClose();
+
+    public void usersCleared();
 }
