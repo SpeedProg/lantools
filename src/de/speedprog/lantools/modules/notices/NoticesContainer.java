@@ -152,7 +152,7 @@ public class NoticesContainer implements ModuleContainer {
     private void handleBoardCreate(final Request request,
             final Response response, final User user,
             final Map<String, Object> data) {
-        final org.simpleframework.http.Form form;
+        final Form form;
         try {
             form = request.getForm();
         } catch (final IOException e) {
