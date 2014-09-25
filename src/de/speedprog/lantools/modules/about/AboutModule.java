@@ -33,42 +33,39 @@ public class AboutModule implements Module {
 
     @Override
     public String getBasePath() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ModuleContainer getModuleContainer() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Icon getIcon() {
-        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ModuleContainer getModuleContainer() {
         return null;
     }
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
         return "About";
     }
 
     @Override
     public JPanel getPanel() {
-        // TODO Auto-generated method stub
         return panel;
     }
 
     @Override
     public String getTip() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void onClose() {
-        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void usersCleared() {
     }
 }

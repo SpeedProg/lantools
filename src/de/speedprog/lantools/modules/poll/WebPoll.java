@@ -16,7 +16,6 @@ limitations under the License.
 package de.speedprog.lantools.modules.poll;
 
 import java.io.Serializable;
-import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,24 +23,26 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.speedprog.lantools.webserver.user.User;
+
 public class WebPoll implements Serializable {
     private final boolean restrictByIp;
     private final Pattern ipPattern;
     private final boolean oneVotePerIp;
     private final Poll poll;
-    private final Set<InetAddress> ips;
-    private final InetAddress ownerAddress;
+    private final Set<User> ips;
+    private final User owner;
     private final UUID uuid;
 
     public WebPoll(final String question, final boolean restrictByIp,
             final Pattern ipPattern, final boolean oneVotePerIp,
-            final int votes, final InetAddress owner, final UUID id) {
+            final int votes, final User owner, final UUID id) {
         this.poll = new Poll(question, votes);
         this.restrictByIp = restrictByIp;
         this.oneVotePerIp = oneVotePerIp;
         this.ipPattern = ipPattern;
         this.ips = new HashSet<>();
-        this.ownerAddress = owner;
+        this.owner = owner;
         this.uuid = id;
     }
 
@@ -53,8 +54,8 @@ public class WebPoll implements Serializable {
         return poll.getOptions();
     }
 
-    public InetAddress getOwnerAddress() {
-        return ownerAddress;
+    public User getOwner() {
+        return owner;
     }
 
     public String getQuestion() {
@@ -67,15 +68,16 @@ public class WebPoll implements Serializable {
      * @return 0 if he is allowed to vote, 1 restricted by ipfilter, 2 already
      *         voted and only one vote alowed.
      */
-    public int getRestriction(final InetAddress address) {
+    public int getRestriction(final User user) {
         if (restrictByIp) { // check if pattern matches ip
-            final Matcher matcher = ipPattern.matcher(address.getHostAddress());
+            final Matcher matcher = ipPattern.matcher(user.getInetAddress()
+                    .getHostAddress());
             if (!matcher.matches()) {
                 return 1;
             }
         }
         if (oneVotePerIp) {
-            if (ips.contains(address)) { // check if ip already voted
+            if (ips.contains(user)) { // check if ip already voted
                 return 2;
             }
         }
@@ -90,51 +92,50 @@ public class WebPoll implements Serializable {
         return poll.getVotes();
     }
 
-    public boolean isAllowed(final InetAddress address) {
+    public boolean isAllowed(final User user) {
         if (restrictByIp) { // check if pattern matches ip
-            final Matcher matcher = ipPattern.matcher(address.getHostAddress());
+            final Matcher matcher = ipPattern.matcher(user.getInetAddress()
+                    .getHostAddress());
             if (!matcher.matches()) {
                 return false;
             }
         }
         if (oneVotePerIp) {
-            if (ips.contains(address)) { // check if ip already voted
+            if (ips.contains(user)) { // check if ip already voted
                 return false;
             }
         }
         return true;
     }
 
-    public synchronized boolean vote(final InetAddress address,
-            final Set<String> options) {
-        return vote(address, options, 1);
+    public synchronized boolean vote(final User user, final Set<String> options) {
+        return vote(user, options, 1);
     }
 
-    public synchronized boolean vote(final InetAddress address,
+    public synchronized boolean vote(final User user,
             final Set<String> options, final int count) {
-        if (isAllowed(address)) {
+        if (isAllowed(user)) {
             poll.addVotes(options, count);
-            ips.add(address);
+            ips.add(user);
             return true;
         }
         return false;
     }
 
-    public synchronized boolean vote(final InetAddress address,
-            final String option) {
-        if (isAllowed(address)) {
+    public synchronized boolean vote(final User user, final String option) {
+        if (isAllowed(user)) {
             poll.addVote(option);
-            ips.add(address);
+            ips.add(user);
             return true;
         }
         return false;
     }
 
-    public synchronized boolean vote(final InetAddress address,
-            final String option, final int count) {
-        if (isAllowed(address)) {
+    public synchronized boolean vote(final User user, final String option,
+            final int count) {
+        if (isAllowed(user)) {
             poll.addVote(option, count);
-            ips.add(address);
+            ips.add(user);
             return true;
         }
         return false;
