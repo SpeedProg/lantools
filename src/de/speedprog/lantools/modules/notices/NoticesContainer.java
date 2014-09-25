@@ -149,7 +149,6 @@ public class NoticesContainer implements ModuleContainer {
                 } else {
                     switch (action) {
                     case ACTION_SHOW_BOARD:
-                        System.out.println("Action Board view.");
                         handleBoardView(request, response, user, data);
                         break;
                     case ACTION_NEW_BOARD:
