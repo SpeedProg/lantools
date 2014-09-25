@@ -16,10 +16,10 @@ function deleteNotice(noticeid) {
 <#include "/menu.ftl">
 <div class="lantools-content" id="board-${board.id}">
     <div class="lantools-header">
-${board.name}
+${board.name?html}
     </div>
     <div class="lantools-subtitle">
-Owner: ${board.owner.username} Desc: ${board.description}
+Owner: ${board.owner.username?html} Desc: ${board.description?html}
     </div>
     <div class="notice-board-body">
         <#list board.entryList as entry>
@@ -28,13 +28,13 @@ Owner: ${board.owner.username} Desc: ${board.description}
         </menu>
         <div contextmenu="cmenu_${entry.id}" class="notice-board lantools-content" id="board-${entry.id}">
             <div class="notice-board-head lantools-header">
-                ${entry.title}
+                ${entry.title?html}
             </div>
             <div class="lantools-subtitle">
-                Author: ${entry.owner.username}
+                Author: ${entry.owner.username?html}
             </div>
             <div class="notice-board-body">
-                ${entry.content}
+                ${entry.content?html}
             </div>
         </div>
         </#list>

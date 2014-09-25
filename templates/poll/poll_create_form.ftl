@@ -2,9 +2,9 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<#include "style.ftl">
+<#include "/style.ftl">
 <title>Poll - New Poll</title>
-<#include "jquery.ftl">
+<#include "/jquery.ftl">
 <script>
 var options = 0;
 function addOption() {
@@ -39,7 +39,7 @@ $(function() {
 });
 </script>
 </head>
-<#include "bodystart.ftl">
+<#include "/bodystart.ftl">
 <#include "/menu.ftl">
 <form class="pure-form pure-form-aligned" method="post" action="${action}" enctype="multipart/form-data">
 <div class="pure-control-group">

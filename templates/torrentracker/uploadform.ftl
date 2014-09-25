@@ -2,10 +2,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<#include "style.ftl">
+<#include "/style.ftl">
 <title>Torrent Tracker - Upload</title>
 </head>
-<#include "bodystart.ftl">
+<#include "/bodystart.ftl">
 <#include "/menu.ftl">
 <#if uploaded!false>
 <#if success>

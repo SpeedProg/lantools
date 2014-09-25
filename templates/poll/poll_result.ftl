@@ -2,12 +2,12 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<#include "style.ftl">
+<#include "/style.ftl">
 <title>Poll - ${pol.question?html} Result</title>
-<#include "jquery.ftl">
+<#include "/jquery.ftl">
 <script src="/html/chart/Chart.min.js"></script>
 </head>
-<#include "bodystart.ftl">
+<#include "/bodystart.ftl">
 <#include "/menu.ftl">
 <table class="pure-table">
 <thead>

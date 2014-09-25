@@ -2,9 +2,9 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<#include "style.ftl">
+<#include "/style.ftl">
 <title>Poll - Vote ${poll.question?html}</title>
-<#include "jquery.ftl">
+<#include "/jquery.ftl">
 <#if (poll.votes > 1)>
 <script type="text/javascript">
 var checkboxes = undefined;
@@ -25,7 +25,7 @@ $(checkboxValidate);
 </script>
 </#if>
 </head>
-<#include "bodystart.ftl">
+<#include "/bodystart.ftl">
 <#include "/menu.ftl">
 <#if poll.restriction == 0>
     <form class="pure-form pure-form-aligned" id="voteform" method="post" action="${action}" enctype="multipart/form-data">

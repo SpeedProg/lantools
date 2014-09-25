@@ -21,14 +21,14 @@
         <div class="notice-board lantools-content" id="board-${board.id}">
             <a href="/notices/?action=${a_show_board}&boardid=${board.id}">
                 <div class="notice-board-head lantools-header">
-                    ${board.name}
+                    ${board.name?html}
                 </div>
             </a>
             <div class="lantools-subtitle">
-                Owner: ${board.owner.username}
+                Owner: ${board.owner.username?html}
             </div>
             <div class="notice-board-body">
-                ${board.description}
+                ${board.description?html}
             </div>
         </div>
         </#list>
