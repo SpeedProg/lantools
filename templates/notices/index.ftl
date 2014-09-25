@@ -33,18 +33,18 @@
         </div>
         </#list>
     </div>
-</div>
-<a href="#" id="showform" onClick="document.getElementById('newboardform').hidden=false;document.getElementById('showform').hidden=true;">Create new Board</a>
-<form id="newboardform" cass="pure-form pure-form-aligned" action="${basepath}?${param_action}=${a_new_board}" method="post" hidden>
+    <a href="#" id="showform" onClick="document.getElementById('newboardform').hidden=false;document.getElementById('showform').hidden=true;">Create new Board</a>
+    <form id="newboardform" cass="pure-form pure-form-aligned" action="${basepath}?${param_action}=${a_new_board}" method="post" hidden>
     <div class="pure-control-group">
-        <label for="name_input">Board Name:</label><input type="text" id="name_input" name="name"/>
+        <label for="name_input">Board Name:</label><input required placeholder="eg. Pizza board" type="text" id="name_input" name="name"/>
     </div>
     <div class="pure-control-group">
-        <label for="desc_textarea">Description:</label><textarea placeholder="Description of the context of this Noticeboard. Max 500 chars." name="desc" maxlength="500"></textarea>
+        <label for="desc_textarea">Description:</label><textarea required placeholder="Description of the context of this Noticeboard. Max 500 chars." name="desc" maxlength="500"></textarea>
     </div>
     <div class="pure-control">
-        <button class="pure-button pure-button-primary" type="submit" name="submit">Submit</button>
+        <button class="pure-button pure-button-primary" type="submit">Submit</button>
     </div>
-</form>
+    </form>
+</div>
 </body>
 </html>
