@@ -2,7 +2,6 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<#escape x as x?html>
 <#include "style.ftl">
 <title>Poll - Vote ${poll.question?html}</title>
 <#include "jquery.ftl">
@@ -34,7 +33,7 @@ $(checkboxValidate);
     <legend>Poll: ${poll.question?html}</legend>
     <#if (poll.votes > 1)>
     
-    <div id="votesleft">Votes left: ${poll.votes}</div><br />
+    <div id="votesleft">Votes left: ${poll.votes?html}</div><br />
     <#list poll.options as option>
     <input class="css-checkbox" type="checkbox" name="option_${option.id}" id="option_${option.id}" value="${option.id}"><label for="option_${option.id}">${option.name?html}</label><br/>
     </#list>
@@ -59,6 +58,5 @@ $(checkboxValidate);
     </#if>
     </p>
 </#if>
-</#escape>
 </body>
 </html>
