@@ -86,13 +86,13 @@ public class LanTools {
     }
 
     public static void main(final String[] args) {
-        prepareForStart();
         if (args.length > 0) {
             if (args[0].equals("--sversion")) {
                 System.out.print(VERSION_STRING);
                 return;
             }
         }
+        prepareForStart();
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
