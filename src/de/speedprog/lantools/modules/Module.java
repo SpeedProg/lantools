@@ -18,8 +18,6 @@ package de.speedprog.lantools.modules;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 
-import org.simpleframework.http.core.Container;
-
 public interface Module {
     /**
      * Can return null if no container should be added.
@@ -35,7 +33,7 @@ public interface Module {
      *
      * @return
      */
-    public Container getContainer();
+    public ModuleContainer getModuleContainer();
 
     public Icon getIcon();
 

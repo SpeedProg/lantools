@@ -34,8 +34,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simpleframework.http.core.Container;
-
 import tk.speedprog.utils.Settings;
 
 import com.jgoodies.forms.factories.FormFactory;
@@ -47,6 +45,7 @@ import com.turn.ttorrent.tracker.Tracker;
 
 import de.speedprog.lantools.LanTools;
 import de.speedprog.lantools.modules.Module;
+import de.speedprog.lantools.modules.ModuleContainer;
 import de.speedprog.lantools.modules.about.AboutModule;
 import de.speedprog.lantools.modules.poll.PollModule;
 import de.speedprog.lantools.modules.torrent.TorrentTrackerModule;
@@ -86,13 +85,13 @@ public class LanToolWindow {
                     module.getTip());
         }
         for (final Module module : modules) {
-            final Container container = module.getContainer();
+            final ModuleContainer container = module.getModuleContainer();
             final String basePathString = module.getBasePath();
             if (container == null || basePathString == null) {
                 continue;
             }
             webServer.addContainer(module.getBasePath(), module.getName(),
-                    module.getContainer());
+                    module.getModuleContainer());
         }
         btnStartWebserver.addActionListener(new StartWebserverActionListener(
                 webServer, ftfWebPort, textFieldWebServerHostName));

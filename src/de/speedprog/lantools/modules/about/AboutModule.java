@@ -18,9 +18,8 @@ package de.speedprog.lantools.modules.about;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 
-import org.simpleframework.http.core.Container;
-
 import de.speedprog.lantools.modules.Module;
+import de.speedprog.lantools.modules.ModuleContainer;
 
 public class AboutModule implements Module {
     private final AboutPanel panel;
@@ -39,7 +38,7 @@ public class AboutModule implements Module {
     }
 
     @Override
-    public Container getContainer() {
+    public ModuleContainer getModuleContainer() {
         // TODO Auto-generated method stub
         return null;
     }
