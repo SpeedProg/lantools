@@ -48,33 +48,30 @@ import com.jgoodies.forms.layout.RowSpec;
 import com.turn.ttorrent.common.Torrent;
 
 import de.speedprog.lantools.modules.ModuleSettings;
-import de.speedprog.lantools.webserver.WebServer;
 
 public class TorrentPanel extends JPanel {
     private JFormattedTextField ftfTrackerPort;
     private JTextField textFieldTrackerHost;
     private JButton buttonStartTracker;
     private final StartTrackerActionListener startTrackerActionListener;
-    private final WebServer webServer;
     private final TorrentService torrentService;
     private final JButton btnCreateTorrent;
 
     /**
      * Create the panel.
      */
-    public TorrentPanel(final WebServer webServer,
-            final TorrentService torrentService, final ModuleSettings settings) {
-        this.webServer = webServer;
+    public TorrentPanel(final TorrentService torrentService,
+            final ModuleSettings settings) {
         this.torrentService = torrentService;
         initialize(settings);
         startTrackerActionListener = new StartTrackerActionListener(
                 ftfTrackerPort, textFieldTrackerHost);
         startTrackerActionListener.addListener(new TrackerStartStopListener());
         buttonStartTracker
-        .setActionCommand(StartTrackerActionListener.AC_START_TRACKER);
+                .setActionCommand(StartTrackerActionListener.AC_START_TRACKER);
         btnCreateTorrent = new JButton("Create Torrent");
         btnCreateTorrent
-        .addActionListener(new BtnCreateTorrentActionListener());
+                .addActionListener(new BtnCreateTorrentActionListener());
         add(btnCreateTorrent, "2, 6, 5, 1");
         buttonStartTracker.addActionListener(startTrackerActionListener);
     }
@@ -143,7 +140,7 @@ public class TorrentPanel extends JPanel {
                 public void run() {
                     final JFileChooser fileChooser = new JFileChooser();
                     fileChooser
-                    .setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                            .setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                     fileChooser.setMultiSelectionEnabled(false);
                     int opt = fileChooser.showOpenDialog(null);
                     if (opt != JFileChooser.APPROVE_OPTION) {
@@ -158,44 +155,44 @@ public class TorrentPanel extends JPanel {
                             final List<File> files = new ArrayList<>();
                             Files.walkFileTree(file.toPath(),
                                     new FileVisitor<Path>() {
-                                        @Override
-                                        public FileVisitResult postVisitDirectory(
-                                                final Path dir,
-                                                final IOException exc)
+                                @Override
+                                public FileVisitResult postVisitDirectory(
+                                        final Path dir,
+                                        final IOException exc)
                                                 throws IOException {
-                                            return FileVisitResult.CONTINUE;
-                                        }
+                                    return FileVisitResult.CONTINUE;
+                                }
 
-                                        @Override
-                                        public FileVisitResult preVisitDirectory(
-                                                final Path dir,
-                                                final BasicFileAttributes attrs)
+                                @Override
+                                public FileVisitResult preVisitDirectory(
+                                        final Path dir,
+                                        final BasicFileAttributes attrs)
                                                 throws IOException {
-                                            // TODO Auto-generated method stub
-                                            return FileVisitResult.CONTINUE;
-                                        }
+                                    // TODO Auto-generated method stub
+                                    return FileVisitResult.CONTINUE;
+                                }
 
-                                        @Override
-                                        public FileVisitResult visitFile(
-                                                final Path file,
-                                                final BasicFileAttributes attrs)
+                                @Override
+                                public FileVisitResult visitFile(
+                                        final Path file,
+                                        final BasicFileAttributes attrs)
                                                 throws IOException {
-                                            files.add(file.toFile());
-                                            return FileVisitResult.CONTINUE;
-                                        }
+                                    files.add(file.toFile());
+                                    return FileVisitResult.CONTINUE;
+                                }
 
-                                        @Override
-                                        public FileVisitResult visitFileFailed(
-                                                final Path file,
-                                                final IOException exc)
+                                @Override
+                                public FileVisitResult visitFileFailed(
+                                        final Path file,
+                                        final IOException exc)
                                                 throws IOException {
-                                            return FileVisitResult.CONTINUE;
-                                        }
-                                    });
+                                    return FileVisitResult.CONTINUE;
+                                }
+                            });
                             torrent = Torrent.create(file, files, new URI(
                                     "http://" + textFieldTrackerHost.getText()
-                                            + ":" + ftfTrackerPort.getText()
-                                            + "/announce"), "LanTools");
+                                    + ":" + ftfTrackerPort.getText()
+                                    + "/announce"), "LanTools");
                         } catch (final InterruptedException e1) {
                             // TODO Auto-generated catch block
                             e1.printStackTrace();

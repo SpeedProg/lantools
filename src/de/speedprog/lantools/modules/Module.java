@@ -23,6 +23,8 @@ import org.simpleframework.http.core.Container;
 public interface Module {
     /**
      * Can return null if no container should be added.
+     * The basePath always needs to be a folder in the form of /PATH/ so it
+     * needs to start with an / and end with /.
      *
      * @return
      */

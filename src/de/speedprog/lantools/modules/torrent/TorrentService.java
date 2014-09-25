@@ -61,35 +61,33 @@ import freemarker.template.Template;
 
 public class TorrentService implements Container {
     private static final String SITE_ENC = "UTF-8";
-    public static final String TORRENTLIST_URL = "/list";
-    public static final String TORRENTLOAD_URL = "/load.torrent";
-    public static final String TORRENTUPLOAD_URL = "/upload";
-    public static final String TORRENTBASE_URL = "/";
-    public static final String TORRENT_ATOM = "/torrents.atom";
-    public static final String TORRENT_RSS = "/torrents.rss";
+    public static final String TORRENTLOAD_URL = "load.torrent";
+    public static final String TORRENTUPLOAD_URL = "upload";
+    //private static final String TORRENTBASE_URL = "";
+    public static final String TORRENT_ATOM = "torrents.atom";
+    public static final String TORRENT_RSS = "torrents.rss";
     private static final String TEMPLATE_DIR = "torrentracker" + File.separator;
     private String basePath;
     private Tracker tracker;
     private String trackerHost;
     private String trackerPort;
     private final Abdera abdera;
-    private final WebServer webServer;
     private final List<Map<String, String>> menuData;
     private final static Configuration CFG = LanTools.getFreeMakerConfig();
+    private final WebServer webServer;
 
     public TorrentService(final String basePath, final Tracker tracker,
             final String trackerHost, final String trackerPort,
             final WebServer webServer) {
+        this.webServer = webServer;
         this.basePath = basePath;
         this.tracker = tracker;
         this.trackerHost = trackerHost;
         this.trackerPort = trackerPort;
-        this.webServer = webServer;
         abdera = new Abdera();
         final MenuModel menuModel = new MenuModel();
         menuModel.addLink("Home", "/");
         menuModel.addLink("Torrent Tracker", basePath);
-        menuModel.addLink("Torrent List", basePath + TORRENTLIST_URL);
         menuModel.addLink("Upload Torrent", basePath + TORRENTUPLOAD_URL);
         menuModel.addLink("RSS 2.0 Feed", basePath + TORRENT_RSS);
         menuModel.addLink("Atom 1.0 Feed", basePath + TORRENT_ATOM);
@@ -138,8 +136,7 @@ public class TorrentService implements Container {
                     relPathString = "/";
                 }
                 switch (relPathString) {
-                case TORRENTBASE_URL:
-                case TORRENTLIST_URL: {
+                case "/": {
                     response.set("Content-Type", "text/html");
                     dataMap.put("tdlurl", basePath + TORRENTLOAD_URL + "?hash=");
                     final List<TrackedTorrent> torrents = new ArrayList<>(
@@ -148,7 +145,7 @@ public class TorrentService implements Container {
                     template = CFG
                             .getTemplate(TEMPLATE_DIR + "torrentlist.ftl");
                 }
-                    break;
+                break;
                 case TORRENTLOAD_URL: {
                     response.set("Content-Type", "application/x-bittorrent");
                     try {
@@ -246,14 +243,16 @@ public class TorrentService implements Container {
                     final Feed feed = abdera.newFeed();
                     feed.setId("tag:lantool.speedprog.de,2014-01-01:/tracker/torrent.atom");
                     feed.setTitle("LanTools Torrent Feed");
-                    feed.setSubtitle("-plz-");
+                    feed.setSubtitle("spread the fun");
                     feed.setUpdated(new Date());
                     final Collection<TrackedTorrent> torrents = tracker
                             .getTrackedTorrents();
                     for (final TrackedTorrent torrent : torrents) {
                         final Entry entry = feed.addEntry();
                         entry.setTitle(torrent.getName());
-                        entry.addLink(basePath + TORRENTLOAD_URL + "?hash="
+                        entry.addLink("http://" + webServer.getHost() + ":"
+                                + webServer.getPort() + basePath
+                                + TORRENTLOAD_URL + "?hash="
                                 + torrent.getHexInfoHash());
                         final IRI iri = new IRI("http://" + webServer.getHost()
                                 + ":" + webServer.getPort() + basePath
@@ -275,14 +274,13 @@ public class TorrentService implements Container {
                         e.printStackTrace();
                     }
                 }
-                    return;
+                return;
                 case TORRENT_RSS: {
                     response.set("Content-Type", "application/rss+xml");
                     final SyndFeed feed = new SyndFeedImpl();
                     feed.setFeedType("rss_2.0");
                     feed.setTitle("LanTools Torrent Feed");
-                    feed.setLink("http://" + webServer.getHost() + ":"
-                            + webServer.getPort() + basePath + TORRENT_RSS);
+                    feed.setLink(basePath + TORRENT_RSS);
                     feed.setDescription("Torrent Feed");
                     final List<SyndEntry> entries = new ArrayList<>();
                     final Collection<TrackedTorrent> torrents = tracker

@@ -97,7 +97,7 @@ public class LanToolWindow {
         btnStartWebserver.addActionListener(new StartWebserverActionListener(
                 webServer, ftfWebPort, textFieldWebServerHostName));
         btnStartWebserver
-                .setActionCommand(StartWebserverActionListener.AC_START);
+        .setActionCommand(StartWebserverActionListener.AC_START);
         frmLantorrenttracker.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
@@ -124,8 +124,8 @@ public class LanToolWindow {
 
     private Collection<Module> getModules() {
         final LinkedList<Module> modules = new LinkedList<>();
-        modules.add(new TorrentTrackerModule(webServer));
-        modules.add(new PollModule());
+        modules.add(new TorrentTrackerModule(null, webServer));
+        modules.add(new PollModule(null));
         modules.add(new AboutModule());
         return modules;
     }

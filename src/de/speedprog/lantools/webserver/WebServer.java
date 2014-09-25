@@ -177,8 +177,8 @@ public class WebServer {
                         }
                     }
                 } else {
-                    final NamedContainer container = containerMap.get("/"
-                            + segmentStrings[0]);
+                    final NamedContainer container = containerMap.get(reqPath
+                            .getDirectory());
                     if (container != null) {
                         container.handle(req, resp);
                     } else {

@@ -29,15 +29,18 @@ public class ModuleSettings {
      *            General Settings object
      * @param basePath
      *            basePath of the Module this setting is for, needs to start
-     *            with a "/" and end without a "/"
+     *            with a "/" and end with a "/"
      */
     public ModuleSettings(final Settings settings, final String basePath) {
+        if (!(basePath.startsWith("/") && basePath.endsWith("/"))) {
+            throw new IllegalArgumentException();
+        }
         this.settings = settings;
         this.basePath = basePath;
     }
 
     public String getString(final String id) {
-        return settings.getString(MODULE_PREFIX + basePath + "/" + id);
+        return settings.getString(MODULE_PREFIX + basePath + id);
     }
 
     /**
@@ -50,6 +53,6 @@ public class ModuleSettings {
      *            the value to store
      */
     public void putString(final String id, final String value) {
-        settings.storeString(MODULE_PREFIX + basePath + "/" + id, value);
+        settings.storeString(MODULE_PREFIX + basePath + id, value);
     }
 }
