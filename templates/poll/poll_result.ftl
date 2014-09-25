@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <#include "style.ftl">
-<title>Poll - Poll Results</title>
+<title>Poll - ${pol.question?html} Result</title>
 <#include "jquery.ftl">
 <script src="/html/chart/Chart.min.js"></script>
 </head>

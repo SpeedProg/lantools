@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <#include "/style.ftl">
-<title>Voted</title>
+<title>Overview</title>
 <#include "/jquery.ftl">
 </head>
 <#include "/bodystart.ftl">

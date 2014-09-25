@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <#include "style.ftl">
-<title>Poll - Poll List</title>
+<title>Poll - Polls</title>
 </head>
 <#include "bodystart.ftl">
 <#include "/menu.ftl">

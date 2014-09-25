@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <#include "style.ftl">
-<title>Torrent Tracker - Torrent Upload</title>
+<title>Torrent Tracker - Upload</title>
 </head>
 <#include "bodystart.ftl">
 <#include "/menu.ftl">

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <#include "style.ftl">
-<title>Poll - Create Poll</title>
+<title>Poll - New Poll</title>
 <#include "jquery.ftl">
 <script>
 var options = 0;

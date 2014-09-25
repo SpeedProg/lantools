@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <#include "/style.ftl">
 <link rel="stylesheet" href="/html/notices/boardview.css">
-<title>Notices - Index</title>
+<title>Notices - ${board.name?html}</title>
 <#include "/jquery.ftl">
 <script type="text/javascript">
 function deleteNotice(noticeid) {

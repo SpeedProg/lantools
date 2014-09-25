@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <#include "/style.ftl">
 <link rel="stylesheet" href="/html/notices/boardview.css">
-<title>Notices - Board</title>
+<title>Notices - Boards</title>
 <#include "/jquery.ftl">
 </head>
 <#include "/bodystart.ftl">

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <#include "style.ftl">
-<title>Voted</title>
+<title>Poll - Voted ${poll.question?html}</title>
 </head>
 <#include "bodystart.ftl">
 <#include "/menu.ftl">
