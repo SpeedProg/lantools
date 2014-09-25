@@ -62,12 +62,12 @@ import freemarker.template.Template;
 
 public class TorrentService implements ModuleContainer {
     private static final String SITE_ENC = "UTF-8";
-    public static final String TORRENTLIST_URL = "/list";
-    public static final String TORRENTLOAD_URL = "/load.torrent";
-    public static final String TORRENTUPLOAD_URL = "/upload";
+    public static final String TORRENTLIST_URL = "list";
+    public static final String TORRENTLOAD_URL = "load.torrent";
+    public static final String TORRENTUPLOAD_URL = "upload";
     public static final String TORRENTBASE_URL = "/";
-    public static final String TORRENT_ATOM = "/torrents.atom";
-    public static final String TORRENT_RSS = "/torrents.rss";
+    public static final String TORRENT_ATOM = "torrents.atom";
+    public static final String TORRENT_RSS = "torrents.rss";
     private static final String TEMPLATE_DIR = "torrentracker" + File.separator;
     private String basePath;
     private Tracker tracker;
@@ -150,7 +150,7 @@ public class TorrentService implements ModuleContainer {
                     template = CFG
                             .getTemplate(TEMPLATE_DIR + "torrentlist.ftl");
                 }
-                    break;
+                break;
                 case TORRENTLOAD_URL: {
                     response.set("Content-Type", "application/x-bittorrent");
                     try {
@@ -277,7 +277,7 @@ public class TorrentService implements ModuleContainer {
                         e.printStackTrace();
                     }
                 }
-                    return;
+                return;
                 case TORRENT_RSS: {
                     response.set("Content-Type", "application/rss+xml");
                     final SyndFeed feed = new SyndFeedImpl();
@@ -312,7 +312,7 @@ public class TorrentService implements ModuleContainer {
                     output.output(feed, new OutputStreamWriter(outputStream));
                     response.close();
                 }
-                return;
+                    return;
                 default:
                     template = CFG.getTemplate("error.ftl");
                     dataMap.put("errormsg", "No valid page!");

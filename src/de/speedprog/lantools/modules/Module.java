@@ -18,6 +18,19 @@ package de.speedprog.lantools.modules;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 
+/**
+ * Interface to create modules for the server.
+ * Each module needs to have a BasePath inside which it should live.
+ * Eg. /notices/ is the BasePath of the Notices Module.
+ * If you need to store simple data, like Integer, Boolean, String
+ * you should obtain a ModuleSettings instance using LanTools#getSettingsFor
+ * which takes your BasePath.
+ * If you need to store more complex informations and
+ * for this create your own files you should do this in cfgBasePath.
+ * Eg. the Notices Module should store it's files in cfg/notices/ .
+ * This path can be obtained by calling LanTools#getModuleConfigPath with your
+ * BasePath.
+ */
 public interface Module {
     /**
      * Can return null if no container should be added.
@@ -26,14 +39,14 @@ public interface Module {
      */
     public String getBasePath();
 
+    public Icon getIcon();
+
     /**
      * Can return null if no container should be added.
      *
      * @return
      */
     public ModuleContainer getModuleContainer();
-
-    public Icon getIcon();
 
     public String getName();
 

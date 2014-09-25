@@ -1,6 +1,11 @@
 package de.speedprog.lantools.modules.notices;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +30,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 public class NoticesContainer implements ModuleContainer {
-    private final Map<UUID, NoticeBoard> boardMap;
+    private Map<UUID, NoticeBoard> boardMap;
     private final String basePath;
     private static final String PARAM_ACTION = "action";
     private static final String PARAM_BOARDID = "boardid";
@@ -36,14 +41,69 @@ public class NoticesContainer implements ModuleContainer {
     private static final Logger LOGGER = Logger
             .getLogger(NoticesContainer.class.getName());
     private final List<Map<String, String>> menuData;
+    private final java.nio.file.Path cfgDirPath;
+    private static final String BOARDMAPFILENAME_STRING = "boardMap.obj";
+    private final File boardMapFile;
 
     public NoticesContainer(final String basePath) {
-        this.boardMap = new ConcurrentHashMap<>();
         this.basePath = basePath;
         final MenuModel menuModel = new MenuModel();
         menuModel.addLink("Home", "/");
         menuModel.addLink("Notice Boards", basePath);
         this.menuData = menuModel.getMenuModel();
+        this.cfgDirPath = LanTools.getModuleConfigPath(this.basePath);
+        this.boardMapFile = cfgDirPath.resolve(BOARDMAPFILENAME_STRING)
+                .toFile();
+        ObjectInputStream ois = null;
+        if (this.boardMapFile.exists()) {
+            try {
+                ois = new ObjectInputStream(new FileInputStream(
+                        this.boardMapFile));
+                final Object dsObject = ois.readObject();
+                if (dsObject instanceof ConcurrentHashMap<?, ?>) {
+                    @SuppressWarnings("unchecked")
+                    final Map<UUID, NoticeBoard> boardMap = (ConcurrentHashMap<UUID, NoticeBoard>) dsObject;
+                    this.boardMap = boardMap;
+                }
+            } catch (final IOException | ClassNotFoundException e1) {
+                LOGGER.log(Level.FINE, "Error reading boardMap from file.", e1);
+            } finally {
+                if (ois != null) {
+                    try {
+                        ois.close();
+                    } catch (final IOException e) {
+                        LOGGER.log(Level.FINE, "Error closing file.", e);
+                    }
+                }
+            }
+        }
+        if (this.boardMap == null) {
+            this.boardMap = new ConcurrentHashMap<>();
+        }
+    }
+
+    public void close() {
+        final ObjectOutputStream outputStream;
+        try {
+            outputStream = new ObjectOutputStream(new FileOutputStream(
+                    boardMapFile));
+        } catch (final IOException e) {
+            LOGGER.log(Level.SEVERE, "Error opening file to save notice data.",
+                    e);
+            return;
+        }
+        try {
+            outputStream.writeObject(boardMap);
+        } catch (final IOException e) {
+            LOGGER.log(Level.SEVERE, "Error saving notice data.", e);
+        } finally {
+            try {
+                outputStream.close();
+            } catch (final IOException e) {
+                LOGGER.log(Level.SEVERE,
+                        "Error closing stream to save notice data.", e);
+            }
+        }
     }
 
     @Override

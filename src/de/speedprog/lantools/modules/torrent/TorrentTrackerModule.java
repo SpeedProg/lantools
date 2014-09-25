@@ -27,24 +27,29 @@ import de.speedprog.lantools.webserver.WebServer;
 public class TorrentTrackerModule implements Module {
     protected static final String SETTING_TRACKERPORT = "tracker_port";
     protected static final String SETTING_TRACKERHOST = "tracker_host";
-    private static final String BASE_PATH = "/tracker/";
+    private static final String DEF_BASE_PATH = "/ttracker/";
     private static final String TAB_NAME = "Torrent Tracker";
     private final TorrentPanel torrentPanel;
     private final WebServer webServer;
     private final TorrentService torrentService;
+    private String basePath;
 
-    public TorrentTrackerModule(final WebServer webServer) {
-        // TODO Auto-generated constructor stub
+    public TorrentTrackerModule(final String basePath, final WebServer webServer) {
+        if (basePath == null) {
+            this.basePath = DEF_BASE_PATH;
+        } else {
+            this.basePath = basePath;
+        }
         this.webServer = webServer;
-        torrentService = new TorrentService(BASE_PATH, null, null, null,
+        torrentService = new TorrentService(this.basePath, null, null, null,
                 webServer);
         torrentPanel = new TorrentPanel(webServer, torrentService,
-                LanTools.getSettingsFor(BASE_PATH));
+                LanTools.getSettingsFor(this.basePath));
     }
 
     @Override
     public String getBasePath() {
-        return BASE_PATH;
+        return basePath;
     }
 
     @Override
@@ -77,8 +82,7 @@ public class TorrentTrackerModule implements Module {
 
     @Override
     public void onClose() {
-        final ModuleSettings moduleSettings = LanTools
-                .getSettingsFor(BASE_PATH);
+        final ModuleSettings moduleSettings = LanTools.getSettingsFor(basePath);
         torrentPanel.onClose(moduleSettings);
     }
 }

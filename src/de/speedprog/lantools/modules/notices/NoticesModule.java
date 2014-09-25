@@ -9,7 +9,7 @@ import de.speedprog.lantools.modules.ModuleContainer;
 public class NoticesModule implements Module {
     private static final String DEF_BASE_PATH = "/notices/";
     private String basePath;
-    private final ModuleContainer moduleContainer;
+    private final NoticesContainer moduleContainer;
 
     public NoticesModule(final String basePath) {
         if (basePath == null) {
@@ -52,6 +52,6 @@ public class NoticesModule implements Module {
 
     @Override
     public void onClose() {
-        // TODO Auto-generated method stub
+        moduleContainer.close();
     }
 }

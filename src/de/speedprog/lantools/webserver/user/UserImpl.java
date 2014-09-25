@@ -1,8 +1,9 @@
 package de.speedprog.lantools.webserver.user;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 
-public class UserImpl implements User {
+public class UserImpl implements User, Serializable {
     private String username;
     private InetAddress address;
 
