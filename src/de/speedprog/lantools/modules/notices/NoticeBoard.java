@@ -2,6 +2,7 @@ package de.speedprog.lantools.modules.notices;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -21,7 +22,8 @@ public class NoticeBoard implements Serializable {
             throw new IllegalArgumentException();
         }
         this.owner = owner;
-        this.entryList = new LinkedList<>();
+        this.entryList = Collections
+                .synchronizedList(new LinkedList<BoardEntry>());
         this.name = name;
         this.id = UUID.randomUUID();
         this.description = description;
@@ -33,6 +35,17 @@ public class NoticeBoard implements Serializable {
 
     public String getDescription() {
         return description;
+    }
+
+    public BoardEntry getEntry(final UUID entryID) {
+        synchronized (entryList) {
+            for (final BoardEntry entry : entryList) {
+                if (entry.getId().equals(entryID)) {
+                    return entry;
+                }
+            }
+        }
+        return null;
     }
 
     public List<BoardEntry> getEntryList() {
@@ -59,5 +72,19 @@ public class NoticeBoard implements Serializable {
      */
     public void removeBoardEntry(final BoardEntry entry) {
         entryList.remove(entry);
+    }
+
+    public BoardEntry removeBoardEntry(final UUID entryID) {
+        synchronized (entryList) {
+            for (final Iterator iterator = entryList.iterator(); iterator
+                    .hasNext();) {
+                final BoardEntry boardEntry = (BoardEntry) iterator.next();
+                if (boardEntry.getId().equals(entryID)) {
+                    iterator.remove();
+                    return boardEntry;
+                }
+            }
+        }
+        return null;
     }
 }

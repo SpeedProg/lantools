@@ -37,6 +37,7 @@ public class NoticesContainer implements ModuleContainer {
     private static final String ACTION_SHOW_BOARD = "board";
     private static final String ACTION_NEW_BOARD = "newboard";
     private static final String ACTION_NEW_NOTICE = "newnotice";
+    private static final String ACTION_DEL_NOTICE = "del_notice";
     private static final Configuration CFG = LanTools.getFreeMakerConfig();
     private static final Logger LOGGER = Logger
             .getLogger(NoticesContainer.class.getName());
@@ -141,6 +142,7 @@ public class NoticesContainer implements ModuleContainer {
                 data.put("a_show_board", ACTION_SHOW_BOARD);
                 data.put("a_new_board", ACTION_NEW_BOARD);
                 data.put("a_new_notice", ACTION_NEW_NOTICE);
+                data.put("a_del_notice", ACTION_DEL_NOTICE);
                 if (action == null) {
                     handleBoardListView(request, response, user, data);
                     return;
@@ -155,6 +157,9 @@ public class NoticesContainer implements ModuleContainer {
                         break;
                     case ACTION_NEW_NOTICE:
                         handleNoticeCreate(request, response, user, data);
+                        break;
+                    case ACTION_DEL_NOTICE:
+                        handleNoticeDelete(request, response, user, data);
                         break;
                     default:
                         response.setCode(Status.NOT_IMPLEMENTED.getCode());
@@ -292,6 +297,41 @@ public class NoticesContainer implements ModuleContainer {
         }
         board.addBoardEntry(new BoardEntry(user, noticeTitle, noticeContent));
         // we can do this since the param boardid is the same
+        handleBoardView(request, response, user, data);
+    }
+
+    private void handleNoticeDelete(final Request request,
+            final Response response, final User user,
+            final Map<String, Object> data) {
+        final Form form;
+        try {
+            form = request.getForm();
+        } catch (final IOException e) {
+            sendInternalServerError(response, e);
+            return;
+        }
+        final String boardidString = form.get("boardid");
+        final String noticeidString = form.get("noticeid");
+        if (boardidString == null | noticeidString == null) {
+            sendBadRequest(response);
+            return;
+        }
+        final UUID boardID;
+        final UUID noticeID;
+        try {
+            boardID = UUID.fromString(boardidString);
+            noticeID = UUID.fromString(noticeidString);
+        } catch (final IllegalArgumentException e) {
+            sendBadRequest(response);
+            return;
+        }
+        final NoticeBoard board = boardMap.get(boardID);
+        if (board == null) {
+            sendBadRequest(response);
+            return;
+        }
+        board.removeBoardEntry(noticeID);
+        // we use name boardid param so we can do this
         handleBoardView(request, response, user, data);
     }
 

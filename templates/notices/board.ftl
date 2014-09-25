@@ -6,6 +6,11 @@
 <link rel="stylesheet" href="/html/notices/boardview.css">
 <title>Notices - Index</title>
 <#include "/jquery.ftl">
+<script type="text/javascript">
+function deleteNotice(noticeid) {
+     window.location.href = "${basepath}?${param_action}=${a_del_notice}&boardid=${board.id}&noticeid="+noticeid;
+}
+</script>
 </head>
 <#include "/bodystart.ftl">
 <#include "/menu.ftl">
@@ -18,7 +23,10 @@ Owner: ${board.owner.username} Desc: ${board.description}
     </div>
     <div class="notice-board-body">
         <#list board.entryList as entry>
-        <div class="notice-board lantools-content" id="board-${entry.id}">
+        <menu type="context" id="cmenu_${entry.id}">
+        <menuitem label="Delete Notice" onclick="deleteNotice('${entry.id}');"/>
+        </menu>
+        <div contextmenu="cmenu_${entry.id}" class="notice-board lantools-content" id="board-${entry.id}">
             <div class="notice-board-head lantools-header">
                 ${entry.title}
             </div>
