@@ -44,7 +44,7 @@ $(checkboxValidate);
     </#if>
     </fieldset>
     <input type="hidden" name="pollid" value="${poll.uuid}"/>
-    <button class="pure-button pure-button-primary" name="submit" type="submit">Submit</button>
+    <button class="pure-button pure-button-primary" type="submit">Submit</button>
     <button class="pure-button" type="reset">Reset</button>
     </form>
 <#else>
