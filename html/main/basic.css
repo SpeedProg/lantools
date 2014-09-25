@@ -1,3 +1,11 @@
+a {
+	color: #000;
+}
+
+a:visited {
+	color: #090;
+}
+
 .lantools-header {
 	background-color: #9BE59A;
 	   font-size: 150%;
