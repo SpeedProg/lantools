@@ -10,6 +10,10 @@
 function deleteNotice(noticeid) {
      window.location.href = "${basepath}?${param_action}=${a_del_notice}&boardid=${board.id}&noticeid="+noticeid;
 }
+function reloadBoard() {
+    $("#boardcontent").load("${basepath}?${param_action}=${a_ajax_notices}&${param_boardid}=${board.id}");
+}
+window.setInterval(reloadBoard, 10000);
 </script>
 </head>
 <#include "/bodystart.ftl">
@@ -21,7 +25,7 @@ ${board.name?html}
     <div class="lantools-subtitle">
 Owner: ${userMapper.getUser(board.owner).username?html} Desc: ${board.description?html}
     </div>
-    <div class="notice-board-body">
+    <div id="boardcontent" class="notice-board-body">
         <#list board.entryList as entry>
         <menu type="context" id="cmenu_${entry.id}">
         <menuitem label="Delete Notice" onclick="deleteNotice('${entry.id}');"/>

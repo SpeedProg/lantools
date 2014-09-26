@@ -39,6 +39,7 @@ public class NoticesContainer implements ModuleContainer {
     private static final String ACTION_NEW_BOARD = "newboard";
     private static final String ACTION_NEW_NOTICE = "newnotice";
     private static final String ACTION_DEL_NOTICE = "del_notice";
+    private static final String ACTION_AJAX_NOTICES = "ajax_notices";
     private static final Configuration CFG = LanTools.getFreeMakerConfig();
     private static final Logger LOGGER = Logger
             .getLogger(NoticesContainer.class.getName());
@@ -146,6 +147,7 @@ public class NoticesContainer implements ModuleContainer {
                 data.put("a_new_board", ACTION_NEW_BOARD);
                 data.put("a_new_notice", ACTION_NEW_NOTICE);
                 data.put("a_del_notice", ACTION_DEL_NOTICE);
+                data.put("a_ajax_notices", ACTION_AJAX_NOTICES);
                 data.put("userMapper", mainContainer.getUserMapper());
                 if (action == null) {
                     handleBoardListView(request, response, user, data);
@@ -163,6 +165,9 @@ public class NoticesContainer implements ModuleContainer {
                         break;
                     case ACTION_DEL_NOTICE:
                         handleNoticeDelete(request, response, user, data);
+                        break;
+                    case ACTION_AJAX_NOTICES:
+                        handleAjaxNotices(request, response, user, data);
                         break;
                     default:
                         response.setCode(Status.NOT_IMPLEMENTED.getCode());
@@ -195,6 +200,39 @@ public class NoticesContainer implements ModuleContainer {
 
     public void usersCleared() {
         boardMap.clear();
+    }
+
+    private void handleAjaxNotices(final Request request,
+            final Response response, final User user,
+            final Map<String, Object> data) {
+        final String boardidString;
+        try {
+            boardidString = request.getParameter(PARAM_BOARDID);
+        } catch (final IOException e1) {
+            sendBadRequest(response);
+            return;
+        }
+        if (boardidString == null) {
+            sendBadRequest(response);
+            return;
+        }
+        final UUID boardID;
+        try {
+            boardID = UUID.fromString(boardidString);
+        } catch (final IllegalArgumentException e) {
+            sendBadRequest(response);
+            return;
+        }
+        final NoticeBoard board = boardMap.get(boardID);
+        data.put("board", board);
+        Template template;
+        try {
+            template = CFG.getTemplate("/notices/ajax_notices.ftl");
+        } catch (final IOException e) {
+            sendInternalServerError(response, e);
+            return;
+        }
+        process(template, data, response);
     }
 
     private void handleBoardCreate(final Request request,
