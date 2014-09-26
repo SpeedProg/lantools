@@ -28,7 +28,7 @@ Owner: ${userMapper.getUser(board.owner).username?html} Desc: ${board.descriptio
         </menu>
         <div contextmenu="cmenu_${entry.id}" class="notice-board lantools-content" id="board-${entry.id}">
             <div class="notice-board-head lantools-header">
-                ${entry.title?html}
+                ${entry.title?html}  <a href="#" style="color: red;" onclick="deleteNotice('${entry.id}');">X</a>
             </div>
             <div class="lantools-subtitle">
                 Author: ${userMapper.getUser(entry.owner).username?html}
