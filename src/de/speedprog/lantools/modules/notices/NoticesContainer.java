@@ -295,8 +295,16 @@ public class NoticesContainer implements ModuleContainer {
             return;
         }
         board.addBoardEntry(new BoardEntry(user, noticeTitle, noticeContent));
-        // we can do this since the param boardid is the same
-        handleBoardView(request, response, user, data);
+        // redirect to board
+        response.setCode(Status.SEE_OTHER.getCode());
+        response.set("Location", basePath + "?" + PARAM_ACTION + "="
+                + ACTION_SHOW_BOARD + "&" + PARAM_BOARDID + "=" + boardIdString);
+        response.setContentLength(0);
+        try {
+            response.close();
+        } catch (final IOException e) {
+            LOGGER.log(Level.INFO, "Error sending answer to notice create.", e);
+        }
     }
 
     private void handleNoticeDelete(final Request request,
@@ -330,8 +338,16 @@ public class NoticesContainer implements ModuleContainer {
             return;
         }
         board.removeBoardEntry(noticeID);
-        // we use name boardid param so we can do this
-        handleBoardView(request, response, user, data);
+        // redirect to board
+        response.setCode(Status.SEE_OTHER.getCode());
+        response.set("Location", basePath + "?" + PARAM_ACTION + "="
+                + ACTION_SHOW_BOARD + "&" + PARAM_BOARDID + "=" + boardidString);
+        response.setContentLength(0);
+        try {
+            response.close();
+        } catch (final IOException e) {
+            LOGGER.log(Level.INFO, "Error sending answer to notice create.", e);
+        }
     }
 
     private void process(final Template template,
