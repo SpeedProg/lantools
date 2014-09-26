@@ -1,5 +1,6 @@
 package de.speedprog.lantools.modules.poll.freenmaker;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -8,7 +9,6 @@ import java.util.UUID;
 
 import de.speedprog.lantools.modules.poll.PollOption;
 import de.speedprog.lantools.modules.poll.WebPoll;
-import de.speedprog.lantools.webserver.user.User;
 
 public class FMPoll {
     /**
@@ -23,7 +23,7 @@ public class FMPoll {
      * @return
      */
     public static List<FMPoll> createFromWebPoll(
-            final Collection<WebPoll> polls, final User cUser,
+            final Collection<WebPoll> polls, final InetAddress cUser,
             final String vote, final String result, final String delete) {
         final List<FMPoll> fmPolls = new ArrayList<>(polls.size());
         for (final Iterator<WebPoll> iterator = polls.iterator(); iterator
@@ -45,7 +45,7 @@ public class FMPoll {
      * @return
      */
     public static FMPoll createFromWebPoll(final WebPoll poll,
-            final User cUser, final String vote, final String result,
+            final InetAddress cUser, final String vote, final String result,
             final String delete) {
         return new FMPoll(poll.getQuestion(), poll.getOptions(), poll
                 .getOwner().equals(cUser), poll.getUuid(),

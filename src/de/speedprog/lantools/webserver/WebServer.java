@@ -53,6 +53,7 @@ public class WebServer {
 
     public void close() throws IOException {
         sConnection.close();
+        mainContainer.close();
     }
 
     public void connect(final InetSocketAddress address, final String hostName)
@@ -64,6 +65,10 @@ public class WebServer {
 
     public String getHost() {
         return host;
+    }
+
+    public MainContainer getMainContainer() {
+        return mainContainer;
     }
 
     public int getPort() {

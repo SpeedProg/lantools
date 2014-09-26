@@ -1,6 +1,8 @@
 package de.speedprog.lantools.webserver.user;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,6 +66,15 @@ public class UserMapper {
         return inetToUserMap.get(address);
     }
 
+    public synchronized Collection<User> getUsers() {
+        return new ArrayList<User>(inetToUserMap.values());
+    }
+
+    public synchronized void removeUserByInetAddress(final InetAddress address) {
+        final UserImpl userImpl = inetToUserMap.remove(address);
+        nameToInetMap.remove(userImpl.getUsername());
+    }
+
     /**
      * Set the username corresponding to a specific InetAddress.
      * You can not set a username that is already used, or set the username of
@@ -84,6 +95,14 @@ public class UserMapper {
         final User user = new UserImpl(username, address);
         addUser(user);
         return true;
+    }
+
+    public synchronized void setUsers(final Collection<UserImpl> users) {
+        inetToUserMap.clear();
+        nameToInetMap.clear();
+        for (final UserImpl impl : users) {
+            addUser(impl);
+        }
     }
 
     private void addUser(final User user) {

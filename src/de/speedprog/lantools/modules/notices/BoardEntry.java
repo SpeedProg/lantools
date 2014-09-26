@@ -1,12 +1,11 @@
 package de.speedprog.lantools.modules.notices;
 
 import java.io.Serializable;
+import java.net.InetAddress;
 import java.util.UUID;
 
-import de.speedprog.lantools.webserver.user.User;
-
 public class BoardEntry implements Serializable {
-    private final User owner;
+    private final InetAddress owner;
     private final String content;
     private final String title;
     private final UUID id;
@@ -22,7 +21,8 @@ public class BoardEntry implements Serializable {
      * @param title
      *            the title
      */
-    public BoardEntry(final User owner, final String title, final String content) {
+    public BoardEntry(final InetAddress owner, final String title,
+            final String content) {
         if (owner == null || content == null || title == null) {
             throw new IllegalArgumentException();
         }
@@ -40,7 +40,7 @@ public class BoardEntry implements Serializable {
         return id;
     }
 
-    public User getOwner() {
+    public InetAddress getOwner() {
         return owner;
     }
 

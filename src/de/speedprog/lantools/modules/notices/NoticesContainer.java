@@ -24,6 +24,7 @@ import org.simpleframework.http.Status;
 import de.speedprog.lantools.LanTools;
 import de.speedprog.lantools.modules.ModuleContainer;
 import de.speedprog.lantools.modules.datamodel.MenuModel;
+import de.speedprog.lantools.webserver.MainContainer;
 import de.speedprog.lantools.webserver.user.User;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -45,8 +46,10 @@ public class NoticesContainer implements ModuleContainer {
     private final java.nio.file.Path cfgDirPath;
     private static final String BOARDMAPFILENAME_STRING = "boardMap.obj";
     private final File boardMapFile;
+    private final MainContainer mainContainer;
 
-    public NoticesContainer(final String basePath) {
+    public NoticesContainer(final MainContainer container, final String basePath) {
+        this.mainContainer = container;
         this.basePath = basePath;
         final MenuModel menuModel = new MenuModel();
         menuModel.addLink("Home", "/");
@@ -143,6 +146,7 @@ public class NoticesContainer implements ModuleContainer {
                 data.put("a_new_board", ACTION_NEW_BOARD);
                 data.put("a_new_notice", ACTION_NEW_NOTICE);
                 data.put("a_del_notice", ACTION_DEL_NOTICE);
+                data.put("userMapper", mainContainer.getUserMapper());
                 if (action == null) {
                     handleBoardListView(request, response, user, data);
                     return;
@@ -209,7 +213,8 @@ public class NoticesContainer implements ModuleContainer {
             sendBadRequest(response);
             return;
         }
-        final NoticeBoard board = new NoticeBoard(user, boardName, boardDesc);
+        final NoticeBoard board = new NoticeBoard(user.getInetAddress(),
+                boardName, boardDesc);
         boardMap.put(board.getId(), board);
         handleBoardListView(request, response, user, data); // show list of boards
     }
@@ -294,7 +299,8 @@ public class NoticesContainer implements ModuleContainer {
             sendBadRequest(response);
             return;
         }
-        board.addBoardEntry(new BoardEntry(user, noticeTitle, noticeContent));
+        board.addBoardEntry(new BoardEntry(user.getInetAddress(), noticeTitle,
+                noticeContent));
         // redirect to board
         response.setCode(Status.SEE_OTHER.getCode());
         response.set("Location", basePath + "?" + PARAM_ACTION + "="

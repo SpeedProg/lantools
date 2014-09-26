@@ -100,7 +100,7 @@ public class LanToolWindow {
         btnStartWebserver.addActionListener(new StartWebserverActionListener(
                 webServer, ftfWebPort, textFieldWebServerHostName));
         btnStartWebserver
-        .setActionCommand(StartWebserverActionListener.AC_START);
+                .setActionCommand(StartWebserverActionListener.AC_START);
         btnClearUsers = new JButton("Clear Users");
         btnClearUsers.addActionListener(new BtnClearUsersActionListener());
         panelSettings.add(btnClearUsers, "6, 4");
@@ -112,6 +112,12 @@ public class LanToolWindow {
                 settings.storeString(SETTINGS_WEBPORT, ftfWebPort.getText());
                 for (final Module module : modules) {
                     module.onClose();
+                }
+                try {
+                    webServer.close();
+                } catch (final IOException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
                 }
                 super.windowClosing(e);
             }
@@ -133,7 +139,7 @@ public class LanToolWindow {
         modules.add(new TorrentTrackerModule(null, webServer));
         modules.add(new PollModule(null));
         modules.add(new AboutModule());
-        modules.add(new NoticesModule(null));
+        modules.add(new NoticesModule(webServer.getMainContainer()));
         return modules;
     }
 

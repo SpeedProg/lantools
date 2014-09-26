@@ -16,6 +16,7 @@ limitations under the License.
 package de.speedprog.lantools.modules.poll;
 
 import java.io.Serializable;
+import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,20 +24,18 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.speedprog.lantools.webserver.user.User;
-
 public class WebPoll implements Serializable {
     private final boolean restrictByIp;
     private final Pattern ipPattern;
     private final boolean oneVotePerIp;
     private final Poll poll;
-    private final Set<User> ips;
-    private final User owner;
+    private final Set<InetAddress> ips;
+    private final InetAddress owner;
     private final UUID uuid;
 
     public WebPoll(final String question, final boolean restrictByIp,
             final Pattern ipPattern, final boolean oneVotePerIp,
-            final int votes, final User owner, final UUID id) {
+            final int votes, final InetAddress owner, final UUID id) {
         this.poll = new Poll(question, votes);
         this.restrictByIp = restrictByIp;
         this.oneVotePerIp = oneVotePerIp;
@@ -54,7 +53,7 @@ public class WebPoll implements Serializable {
         return poll.getOptions();
     }
 
-    public User getOwner() {
+    public InetAddress getOwner() {
         return owner;
     }
 
@@ -68,10 +67,9 @@ public class WebPoll implements Serializable {
      * @return 0 if he is allowed to vote, 1 restricted by ipfilter, 2 already
      *         voted and only one vote alowed.
      */
-    public int getRestriction(final User user) {
+    public int getRestriction(final InetAddress user) {
         if (restrictByIp) { // check if pattern matches ip
-            final Matcher matcher = ipPattern.matcher(user.getInetAddress()
-                    .getHostAddress());
+            final Matcher matcher = ipPattern.matcher(user.getHostAddress());
             if (!matcher.matches()) {
                 return 1;
             }
@@ -92,10 +90,9 @@ public class WebPoll implements Serializable {
         return poll.getVotes();
     }
 
-    public boolean isAllowed(final User user) {
+    public boolean isAllowed(final InetAddress user) {
         if (restrictByIp) { // check if pattern matches ip
-            final Matcher matcher = ipPattern.matcher(user.getInetAddress()
-                    .getHostAddress());
+            final Matcher matcher = ipPattern.matcher(user.getHostAddress());
             if (!matcher.matches()) {
                 return false;
             }
@@ -108,11 +105,12 @@ public class WebPoll implements Serializable {
         return true;
     }
 
-    public synchronized boolean vote(final User user, final Set<String> options) {
+    public synchronized boolean vote(final InetAddress user,
+            final Set<String> options) {
         return vote(user, options, 1);
     }
 
-    public synchronized boolean vote(final User user,
+    public synchronized boolean vote(final InetAddress user,
             final Set<String> options, final int count) {
         if (isAllowed(user)) {
             poll.addVotes(options, count);
@@ -122,7 +120,7 @@ public class WebPoll implements Serializable {
         return false;
     }
 
-    public synchronized boolean vote(final User user, final String option) {
+    public synchronized boolean vote(final InetAddress user, final String option) {
         if (isAllowed(user)) {
             poll.addVote(option);
             ips.add(user);
@@ -131,8 +129,8 @@ public class WebPoll implements Serializable {
         return false;
     }
 
-    public synchronized boolean vote(final User user, final String option,
-            final int count) {
+    public synchronized boolean vote(final InetAddress user,
+            final String option, final int count) {
         if (isAllowed(user)) {
             poll.addVote(option, count);
             ips.add(user);

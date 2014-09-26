@@ -19,7 +19,7 @@ function deleteNotice(noticeid) {
 ${board.name?html}
     </div>
     <div class="lantools-subtitle">
-Owner: ${board.owner.username?html} Desc: ${board.description?html}
+Owner: ${userMapper.getUser(board.owner).username?html} Desc: ${board.description?html}
     </div>
     <div class="notice-board-body">
         <#list board.entryList as entry>
@@ -31,7 +31,7 @@ Owner: ${board.owner.username?html} Desc: ${board.description?html}
                 ${entry.title?html}
             </div>
             <div class="lantools-subtitle">
-                Author: ${entry.owner.username?html}
+                Author: ${userMapper.getUser(entry.owner).username?html}
             </div>
             <div class="notice-board-body">
                 ${entry.content?html}

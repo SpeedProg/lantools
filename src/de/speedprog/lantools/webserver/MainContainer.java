@@ -1,13 +1,18 @@
 package de.speedprog.lantools.webserver;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,22 +29,33 @@ import de.speedprog.lantools.LanTools;
 import de.speedprog.lantools.modules.ModuleContainer;
 import de.speedprog.lantools.modules.datamodel.MenuModel;
 import de.speedprog.lantools.webserver.user.User;
+import de.speedprog.lantools.webserver.user.UserImpl;
 import de.speedprog.lantools.webserver.user.UserMapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
-public class MainContainer implements Container {
+public class MainContainer implements Container, Closeable {
     private final ConcurrentHashMap<String, NamedModuleContainer> containerMap;
     private final UserMapper userMapper;
     private List<Map<String, String>> menuData;
     private final MenuModel menuModel;
+    private final File userFile;
+    private static final String USERFILENAME = "users.obj";
+    private static final String ACTION_CHANGE_NAME = "changename";
 
     public MainContainer() {
         containerMap = new ConcurrentHashMap<String, NamedModuleContainer>();
         userMapper = new UserMapper();
         menuModel = new MenuModel();
         menuModel.addLink("Home", "/");
+        menuModel.addLink("Change Name", "/?action=" + ACTION_CHANGE_NAME);
         menuData = menuModel.getMenuModel();
+        this.userFile = LanTools.getModuleConfigPath("/").resolve(USERFILENAME)
+                .toFile();
+        try {
+            loadUsers();
+        } catch (final IOException e) {
+        }
     }
 
     /**
@@ -65,6 +81,16 @@ public class MainContainer implements Container {
 
     public void clearUsers() {
         userMapper.clearUsers();
+        userFile.delete();
+    }
+
+    @Override
+    public void close() throws IOException {
+        saveUsers();
+    }
+
+    public UserMapper getUserMapper() {
+        return userMapper;
     }
 
     @Override
@@ -168,7 +194,34 @@ public class MainContainer implements Container {
         }
         if (segmentStrings.length == 0) {
             // list containers!
-            sendContainerList(resp);
+            String actionString = null;
+            try {
+                actionString = req.getParameter("action");
+            } catch (final IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if (actionString == null) {
+                actionString = "";
+            }
+            switch (actionString) {
+            case ACTION_CHANGE_NAME:
+                userMapper.removeUserByInetAddress(req.getClientAddress()
+                        .getAddress());
+                resp.setCode(Status.SEE_OTHER.getCode());
+                resp.set("Location", "/");
+                resp.setContentLength(0);
+                try {
+                    resp.close();
+                } catch (final IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                break;
+            default:
+                sendContainerList(resp);
+                break;
+            }
         } else if (segmentStrings.length > 0) { // should always go to == 0 or here
             if (segmentStrings[0].equals("html")) { // send the files :)
                 // build the path
@@ -232,6 +285,33 @@ public class MainContainer implements Container {
 
     public ModuleContainer removeContainer(final String basePath) {
         return containerMap.remove(basePath);
+    }
+
+    private void loadUsers() throws IOException {
+        final ObjectInputStream ois = new ObjectInputStream(
+                new FileInputStream(userFile));
+        Object object;
+        try {
+            object = ois.readObject();
+        } catch (final ClassNotFoundException e) {
+            ois.close();
+            return;
+        } finally {
+            ois.close();
+        }
+        if (object instanceof Collection<?>) {
+            @SuppressWarnings("unchecked")
+            final Collection<UserImpl> users = (Collection<UserImpl>) object;
+            userMapper.setUsers(users);
+        }
+    }
+
+    private void saveUsers() throws IOException {
+        final ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(userFile));
+        final Collection<User> users = userMapper.getUsers();
+        oos.writeObject(users);
+        oos.close();
     }
 
     private void sendContainerList(final Response response) {
