@@ -40,6 +40,7 @@ import org.simpleframework.http.Part;
 import org.simpleframework.http.Path;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
+import org.simpleframework.http.Status;
 
 import com.rometools.rome.feed.synd.SyndEnclosure;
 import com.rometools.rome.feed.synd.SyndEnclosureImpl;
@@ -68,6 +69,9 @@ public class TorrentService implements ModuleContainer {
     public static final String TORRENT_ATOM = "torrents.atom";
     public static final String TORRENT_RSS = "torrents.rss";
     private static final String TEMPLATE_DIR = "torrentracker" + File.separator;
+    private static final String PARAM_ACTION = "action";
+    private static final String ACTION_DELETE = "del_torrent";
+    private static final String PARAM_TORRENT_INFOHASH = "torrenthash";
     private String basePath;
     private Tracker tracker;
     private String trackerHost;
@@ -76,6 +80,7 @@ public class TorrentService implements ModuleContainer {
     private final List<Map<String, String>> menuData;
     private final static Configuration CFG = LanTools.getFreeMakerConfig();
     private final WebServer webServer;
+    private final HashMap<String, File> infoHashToFile;
 
     public TorrentService(final String basePath, final Tracker tracker,
             final String trackerHost, final String trackerPort,
@@ -93,6 +98,7 @@ public class TorrentService implements ModuleContainer {
         menuModel.addLink("RSS 2.0 Feed", basePath + TORRENT_RSS);
         menuModel.addLink("Atom 1.0 Feed", basePath + TORRENT_ATOM);
         menuData = menuModel.getMenuModel();
+        infoHashToFile = new HashMap<>();
     }
 
     @Override
@@ -116,6 +122,10 @@ public class TorrentService implements ModuleContainer {
             final Map<String, Object> dataMap = new HashMap<String, Object>();
             final Template template;
             dataMap.put("menulinks", menuData);
+            dataMap.put("basepath", basePath);
+            dataMap.put("param_action", PARAM_ACTION);
+            dataMap.put("a_del_torrent", ACTION_DELETE);
+            dataMap.put("param_torrenthash", PARAM_TORRENT_INFOHASH);
             if (tracker == null) {
                 response.set("Content-Type", "text/html");
                 template = CFG.getTemplate(TEMPLATE_DIR + "notrunning.ftl");
@@ -139,15 +149,51 @@ public class TorrentService implements ModuleContainer {
                 }
                 switch (relPathString) {
                 case "/": {
-                    response.set("Content-Type", "text/html");
-                    dataMap.put("tdlurl", basePath + TORRENTLOAD_URL + "?hash=");
-                    final List<TrackedTorrent> torrents = new ArrayList<>(
-                            tracker.getTrackedTorrents());
-                    dataMap.put("torrents", torrents);
-                    template = CFG
-                            .getTemplate(TEMPLATE_DIR + "torrentlist.ftl");
+                    System.out.println("at /");
+                    final String actionString = req.getParameter(PARAM_ACTION);
+                    if (actionString != null) {
+                        System.out.println("Action: " + actionString);
+                        if (actionString.equals(ACTION_DELETE)) {
+                            System.out.println("Action delte!");
+                            final String torrenthash = req
+                                    .getParameter(PARAM_TORRENT_INFOHASH);
+                            if (torrenthash != null) {
+                                final Collection<TrackedTorrent> torrents = tracker
+                                        .getTrackedTorrents();
+                                for (final TrackedTorrent torrent : torrents) {
+                                    if (torrent.getHexInfoHash()
+                                            .equals(torrenthash)) {
+                                        tracker.remove(torrent);
+                                        infoHashToFile.remove(torrenthash)
+                                        .delete();
+                                        break;
+                                    }
+                                }
+                            }
+                            response.setCode(Status.SEE_OTHER.getCode());
+                            response.set("Location", basePath);
+                            response.setContentLength(0);
+                            response.close();
+                            return;
+                        } else {
+                            response.setCode(Status.BAD_REQUEST.getCode());
+                            response.set("Location", basePath);
+                            response.setContentLength(0);
+                            response.close();
+                            return;
+                        }
+                    } else {
+                        response.set("Content-Type", "text/html");
+                        dataMap.put("tdlurl", basePath + TORRENTLOAD_URL
+                                + "?hash=");
+                        final List<TrackedTorrent> torrents = new ArrayList<>(
+                                tracker.getTrackedTorrents());
+                        dataMap.put("torrents", torrents);
+                        template = CFG
+                                .getTemplate(TEMPLATE_DIR + "torrentlist.ftl");
+                    }
                 }
-                break;
+                    break;
                 case TORRENTLOAD_URL: {
                     response.set("Content-Type", "application/x-bittorrent");
                     try {
@@ -197,10 +243,28 @@ public class TorrentService implements ModuleContainer {
                     case "upload":
                         final Part part = req.getPart("file");
                         if (part.isFile()) {
-                            final File file = new File("./"
-                                    + part.getFileName());
+                            // always make files end with .torrent
+                            String fileNameString = part.getFileName();
+                            if (!(fileNameString.endsWith(".torrent"))) {
+                                fileNameString = fileNameString + ".torrent";
+                            }
+                            final File file = new File(
+                                    getTorrentDir().toFile(),
+                                    fileNameString);
+                            // if that file is already there send failed!
                             if (file.exists()) {
-                                file.delete();
+                                dataMap.put("uploaded", true);
+                                dataMap.put("success", false);
+                                dataMap.put(
+                                        "msg",
+                                        "A file with "
+                                                + fileNameString
+                                                + " as filename already exists.");
+                                dataMap.put("showform", true);
+                                dataMap.put("action", basePath
+                                        + TORRENTUPLOAD_URL
+                                        + "?site=upload");
+                                break;
                             }
                             final FileOutputStream FileOutputStream = new FileOutputStream(
                                     file);
@@ -222,6 +286,8 @@ public class TorrentService implements ModuleContainer {
                                 torrent = null;
                             }
                             if (torrent != null) {
+                                infoHashToFile.put(torrent.getHexInfoHash(),
+                                        file);
                                 tracker.announce(torrent);
                             }
                             dataMap.put("uploaded", true);
@@ -276,7 +342,7 @@ public class TorrentService implements ModuleContainer {
                         e.printStackTrace();
                     }
                 }
-                return;
+                    return;
                 case TORRENT_RSS: {
                     response.set("Content-Type", "application/rss+xml");
                     final SyndFeed feed = new SyndFeedImpl();
@@ -329,6 +395,30 @@ public class TorrentService implements ModuleContainer {
         }
     }
 
+    public void loadTorrents() {
+        final File baseFile = getTorrentDir().toFile();
+        final File[] torrentFiles = baseFile
+                .listFiles(new java.io.FileFilter() {
+                    @Override
+                    public boolean accept(final File pathname) {
+                        return (pathname.isFile() && pathname.getName()
+                                .endsWith(".torrent"));
+                    }
+                });
+        for (final File file : torrentFiles) {
+            TrackedTorrent trackedTorrent;
+            try {
+                trackedTorrent = TrackedTorrent.load(file);
+                infoHashToFile.put(trackedTorrent.getHexInfoHash(), file);
+                tracker.announce(trackedTorrent);
+            } catch (final IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                file.delete();
+            }
+        }
+    }
+
     public void setBasePath(final String basePath) {
         this.basePath = basePath;
     }
@@ -375,5 +465,17 @@ public class TorrentService implements ModuleContainer {
                 + basePath
                 + TORRENTUPLOAD_URL
                 + "?site=upload\" method=\"post\" enctype=\"multipart/form-data\"><label for=\"file\">Torrent File:</label><input type=\"file\" name=\"file\" id=\"file\" /><input type=\"submit\" value=\"Upload\"></form>";
+    }
+
+    private java.nio.file.Path getTorrentDir() {
+        final java.nio.file.Path modulePath = LanTools
+                .getModuleConfigPath(basePath);
+        final java.nio.file.Path torrentDirPath = modulePath
+                .resolve("torrent");
+        // create dirs if they do not exist
+        if (!torrentDirPath.toFile().exists()) {
+            torrentDirPath.toFile().mkdirs();
+        }
+        return torrentDirPath;
     }
 }

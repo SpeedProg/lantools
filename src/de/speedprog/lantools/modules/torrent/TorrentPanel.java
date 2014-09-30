@@ -32,6 +32,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -47,6 +49,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 import com.turn.ttorrent.common.Torrent;
 
+import de.speedprog.lantools.LanTools;
 import de.speedprog.lantools.modules.ModuleSettings;
 
 public class TorrentPanel extends JPanel {
@@ -56,6 +59,8 @@ public class TorrentPanel extends JPanel {
     private final StartTrackerActionListener startTrackerActionListener;
     private final TorrentService torrentService;
     private final JButton btnCreateTorrent;
+    private static final Logger LOGGER = Logger.getLogger(TorrentPanel.class
+            .getName());
 
     /**
      * Create the panel.
@@ -155,44 +160,44 @@ public class TorrentPanel extends JPanel {
                             final List<File> files = new ArrayList<>();
                             Files.walkFileTree(file.toPath(),
                                     new FileVisitor<Path>() {
-                                @Override
-                                public FileVisitResult postVisitDirectory(
-                                        final Path dir,
-                                        final IOException exc)
+                                        @Override
+                                        public FileVisitResult postVisitDirectory(
+                                                final Path dir,
+                                                final IOException exc)
                                                 throws IOException {
-                                    return FileVisitResult.CONTINUE;
-                                }
+                                            return FileVisitResult.CONTINUE;
+                                        }
 
-                                @Override
-                                public FileVisitResult preVisitDirectory(
-                                        final Path dir,
-                                        final BasicFileAttributes attrs)
+                                        @Override
+                                        public FileVisitResult preVisitDirectory(
+                                                final Path dir,
+                                                final BasicFileAttributes attrs)
                                                 throws IOException {
-                                    // TODO Auto-generated method stub
-                                    return FileVisitResult.CONTINUE;
-                                }
+                                            // TODO Auto-generated method stub
+                                            return FileVisitResult.CONTINUE;
+                                        }
 
-                                @Override
-                                public FileVisitResult visitFile(
-                                        final Path file,
-                                        final BasicFileAttributes attrs)
+                                        @Override
+                                        public FileVisitResult visitFile(
+                                                final Path file,
+                                                final BasicFileAttributes attrs)
                                                 throws IOException {
-                                    files.add(file.toFile());
-                                    return FileVisitResult.CONTINUE;
-                                }
+                                            files.add(file.toFile());
+                                            return FileVisitResult.CONTINUE;
+                                        }
 
-                                @Override
-                                public FileVisitResult visitFileFailed(
-                                        final Path file,
-                                        final IOException exc)
+                                        @Override
+                                        public FileVisitResult visitFileFailed(
+                                                final Path file,
+                                                final IOException exc)
                                                 throws IOException {
-                                    return FileVisitResult.CONTINUE;
-                                }
-                            });
+                                            return FileVisitResult.CONTINUE;
+                                        }
+                                    });
                             torrent = Torrent.create(file, files, new URI(
                                     "http://" + textFieldTrackerHost.getText()
-                                    + ":" + ftfTrackerPort.getText()
-                                    + "/announce"), "LanTools");
+                                            + ":" + ftfTrackerPort.getText()
+                                            + "/announce"), "LanTools");
                         } catch (final InterruptedException e1) {
                             // TODO Auto-generated catch block
                             e1.printStackTrace();
@@ -230,15 +235,34 @@ public class TorrentPanel extends JPanel {
                         onEnd();
                         return;
                     }
-                    final File tFile = fileChooser.getSelectedFile();
+                    File tFile = fileChooser.getSelectedFile();
+                    // add .torrent if it doesn't end on .torrent
+                    if (!(tFile.getName().endsWith(".torrent"))) {
+                        tFile = new File(tFile.getParentFile(), tFile.getName()
+                                + ".torrent");
+                    }
+                    FileOutputStream fos;
                     try {
-                        torrent.save(new FileOutputStream(tFile));
-                    } catch (final FileNotFoundException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
+                        fos = new FileOutputStream(tFile);
+                    } catch (final FileNotFoundException e2) {
+                        LOGGER.log(Level.SEVERE, "Error opening file.", e2);
+                        LanTools.showMsg("Error creating torrent. "
+                                + e2.getMessage());
+                        onEnd();
+                        return;
+                    }
+                    try {
+                        torrent.save(fos);
                     } catch (final IOException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
+                        LOGGER.log(Level.SEVERE, "Error saving torrent.", e1);
+                        LanTools.showMsg("Error creating torrent. "
+                                + e1.getMessage());
+                        onEnd();
+                    }
+                    try {
+                        fos.close();
+                    } catch (final IOException e) {
+                        LOGGER.log(Level.SEVERE, "Error closing torrent.", e);
                     }
                     onEnd();
                 }
@@ -247,6 +271,7 @@ public class TorrentPanel extends JPanel {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
+                            System.out.println("Torrent Ready");
                             button.setText("Create torrent");
                             button.setEnabled(true);
                         }
@@ -262,6 +287,7 @@ public class TorrentPanel extends JPanel {
             torrentService.setTracker(startTrackerActionListener.getTracker());
             torrentService.setTrackerHost(textFieldTrackerHost.getText());
             torrentService.setTrackerPort(ftfTrackerPort.getText());
+            torrentService.loadTorrents();
         }
 
         @Override

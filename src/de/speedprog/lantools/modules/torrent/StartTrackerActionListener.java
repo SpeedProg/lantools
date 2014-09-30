@@ -17,7 +17,6 @@ package de.speedprog.lantools.modules.torrent;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Collections;
@@ -28,7 +27,6 @@ import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
 
-import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 
 public class StartTrackerActionListener implements ActionListener {
@@ -37,7 +35,6 @@ public class StartTrackerActionListener implements ActionListener {
     private static final String BASE_PATH = "/tracker";
     private final JFormattedTextField trackerPortTextField;
     private final JTextField trackerHostJTextField;
-    private int lastPort = -1;
     private Tracker tracker;
     private final List<StartStopListener> listeners;
 
@@ -57,16 +54,13 @@ public class StartTrackerActionListener implements ActionListener {
         switch (ac) {
         case AC_START_TRACKER:
             final int port = Integer.parseInt(trackerPortTextField.getText());
-            if (port != lastPort || tracker == null) {
-                try {
-                    tracker = new Tracker(new InetSocketAddress(port));
-                } catch (final IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                    tracker = null;
-                    return;
-                }
-                lastPort = port;
+            try {
+                tracker = new Tracker(new InetSocketAddress(port));
+            } catch (final IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                tracker = null;
+                return;
             }
             tracker.start();
             (new Thread(new Runnable() {
@@ -115,25 +109,5 @@ public class StartTrackerActionListener implements ActionListener {
     }
 
     private void loadTorrents(final Tracker tracker) {
-        final File baseFile = new File(".");
-        final File[] torrentFiles = baseFile
-                .listFiles(new java.io.FileFilter() {
-                    @Override
-                    public boolean accept(final File pathname) {
-                        return (pathname.isFile() && pathname.getName()
-                                .endsWith(".torrent"));
-                    }
-                });
-        for (final File file : torrentFiles) {
-            TrackedTorrent trackedTorrent;
-            try {
-                trackedTorrent = TrackedTorrent.load(file);
-                tracker.announce(trackedTorrent);
-            } catch (final IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-                file.delete();
-            }
-        }
     }
 }

@@ -11,7 +11,7 @@
 <#if success>
 <p>You uploaded <a href="${tdlurl}${torrent.hexInfoHash}">${torrent.name?html}</a>.</p>
 <#else>
-<p>Your upload failed, most likely it wasn't a valid torrent file.</p>
+<p>Your upload failed, most likely it wasn't a valid torrent file.<#if msg??> ${msg?html}</#if></p>
 </#if>
 </#if>
 <#if showform!false>

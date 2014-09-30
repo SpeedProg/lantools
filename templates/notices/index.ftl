@@ -25,7 +25,7 @@
                 </div>
             </a>
             <div class="lantools-subtitle">
-                Owner: ${userMapper.getUser(board.owner).username?html}
+                Owner: ${(userMapper.getUser(board.owner).username)!"Unknown"?html}
             </div>
             <div class="notice-board-body">
                 ${board.description?html}

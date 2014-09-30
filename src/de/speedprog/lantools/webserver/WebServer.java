@@ -23,16 +23,16 @@ import org.simpleframework.transport.connect.SocketConnection;
 import de.speedprog.lantools.modules.ModuleContainer;
 
 public class WebServer {
-    private final SocketConnection sConnection;
+    private SocketConnection sConnection;
     private final MainContainer mainContainer;
     private int port;
     private String host;
 
     public WebServer() throws IOException {
         mainContainer = new MainContainer();
-        sConnection = new SocketConnection(mainContainer);
         port = -1;
         host = "";
+        sConnection = null;
     }
 
     /**
@@ -52,7 +52,9 @@ public class WebServer {
     }
 
     public void close() throws IOException {
-        sConnection.close();
+        if (sConnection != null) {
+            sConnection.close();
+        }
         mainContainer.close();
     }
 
@@ -60,6 +62,7 @@ public class WebServer {
             throws IOException {
         port = address.getPort();
         host = hostName;
+        sConnection = new SocketConnection(mainContainer);
         sConnection.connect(address);
     }
 

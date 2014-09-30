@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import tk.speedprog.utils.Settings;
@@ -113,6 +114,10 @@ public class LanTools {
                 LanTools.closeSettings();
             }
         }));
+    }
+
+    public static void showMsg(final String msg) {
+        JOptionPane.showMessageDialog(null, msg);
     }
 
     private static void prepareForStart() {

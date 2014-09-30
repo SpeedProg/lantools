@@ -23,7 +23,7 @@ window.setInterval(reloadBoard, 10000);
 ${board.name?html}
     </div>
     <div class="lantools-subtitle">
-Owner: ${userMapper.getUser(board.owner).username?html} Desc: ${board.description?html}
+Owner: ${(userMapper.getUser(board.owner).username)!"Unknown"?html} Desc: ${board.description?html}
     </div>
     <div id="boardcontent" class="notice-board-body">
         <#list board.entryList as entry>
@@ -35,7 +35,7 @@ Owner: ${userMapper.getUser(board.owner).username?html} Desc: ${board.descriptio
                 ${entry.title?html}  <a href="#" style="color: red;" onclick="deleteNotice('${entry.id}');">X</a>
             </div>
             <div class="lantools-subtitle">
-                Author: ${userMapper.getUser(entry.owner).username?html}
+                Author: ${(userMapper.getUser(entry.owner).username)!"Unknown"?html}
             </div>
             <div class="notice-board-body">
                 ${entry.content?html}
