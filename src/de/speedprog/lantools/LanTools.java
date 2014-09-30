@@ -133,8 +133,8 @@ public class LanTools {
     }
 
     private static final Path CFG_PATH = Paths.get(".", "cfg");
-    public static final String VERSION_STRING = "1.0.0-RC4";
-    public static final Integer VERSION_NUM = 6;
+    public static final String VERSION_STRING = "1.0.0-RC5";
+    public static final Integer VERSION_NUM = 7;
     private static Configuration CFG = null;
     private static final Settings SETTINGS = new Settings(getModuleConfigPath(
             "/").resolve("settings.xml").toString());
