@@ -16,5 +16,6 @@
 </#list>
 </ul>
 </div>
+<div>${customhtml}</div>
 </body>
 </html>

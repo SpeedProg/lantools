@@ -82,4 +82,8 @@ public class WebServer {
         // TODO: remove from menu
         return mainContainer.removeContainer(basePath);
     }
+
+    public void setCustomHTML(final String html) {
+        mainContainer.setCustomHTML(html);
+    }
 }

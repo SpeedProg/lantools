@@ -42,6 +42,7 @@ public class MainContainer implements Container, Closeable {
     private final File userFile;
     private static final String USERFILENAME = "users.obj";
     private static final String ACTION_CHANGE_NAME = "changename";
+    private volatile String customHTML;
 
     public MainContainer() {
         containerMap = new ConcurrentHashMap<String, NamedModuleContainer>();
@@ -56,6 +57,7 @@ public class MainContainer implements Container, Closeable {
             loadUsers();
         } catch (final IOException e) {
         }
+        this.customHTML = "";
     }
 
     /**
@@ -101,6 +103,7 @@ public class MainContainer implements Container, Closeable {
                 .getAddress());
         final Path reqPath = req.getPath();
         final String[] segmentStrings = reqPath.getSegments();
+        // no username set
         if (user == null
                 && !(segmentStrings.length > 0 && segmentStrings[0]
                         .equals("html"))) {
@@ -192,6 +195,7 @@ public class MainContainer implements Container, Closeable {
                 return;
             }
         }
+        // this is base page /
         if (segmentStrings.length == 0) {
             // list containers!
             String actionString = null;
@@ -287,6 +291,10 @@ public class MainContainer implements Container, Closeable {
         return containerMap.remove(basePath);
     }
 
+    public void setCustomHTML(final String html) {
+        this.customHTML = html;
+    }
+
     private void loadUsers() throws IOException {
         final ObjectInputStream ois = new ObjectInputStream(
                 new FileInputStream(userFile));
@@ -318,6 +326,7 @@ public class MainContainer implements Container, Closeable {
         try {
             response.set("Content-Type", "text/html");
             final Map<String, Object> dataMap = new HashMap<String, Object>();
+            dataMap.put("customhtml", customHTML);
             dataMap.put("menulinks", menuData);
             final List<NamedModuleContainer> containers = new ArrayList<>(
                     containerMap.values());

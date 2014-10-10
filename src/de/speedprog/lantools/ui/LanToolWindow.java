@@ -33,8 +33,14 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 import tk.speedprog.utils.Settings;
 
@@ -58,6 +64,7 @@ import de.speedprog.lantools.webserver.WebServer;
 public class LanToolWindow {
     private static final String SETTINGS_WEBPORT = "web_port";
     private static final String SETTINGS_WEBHOST = "web_host";
+    private static final String SETTINGS_CUSTOMHTML = "custom_html";
     private JFrame frmLantorrenttracker;
     private JTabbedPane tabbedPane;
     private JPanel panelSettings;
@@ -69,6 +76,7 @@ public class LanToolWindow {
     private final Settings settings;
     private final Collection<Module> modules;
     private final JButton btnClearUsers;
+    private final JTextArea textAreaCustomHTML;
 
     /**
      * Create the application.
@@ -78,6 +86,8 @@ public class LanToolWindow {
     public LanToolWindow() throws IOException {
         settings = LanTools.getSettings();
         webServer = new WebServer();
+        btnClearUsers = new JButton("Clear Users");
+        textAreaCustomHTML = new JTextArea();
         initialize();
         modules = getModules();
         for (final Module module : modules) {
@@ -101,15 +111,40 @@ public class LanToolWindow {
                 webServer, ftfWebPort, textFieldWebServerHostName));
         btnStartWebserver
                 .setActionCommand(StartWebserverActionListener.AC_START);
-        btnClearUsers = new JButton("Clear Users");
         btnClearUsers.addActionListener(new BtnClearUsersActionListener());
-        panelSettings.add(btnClearUsers, "6, 4");
+        textAreaCustomHTML.getDocument().addDocumentListener(
+                new DocumentListener() {
+                    @Override
+                    public void changedUpdate(final DocumentEvent e) {
+                    }
+
+                    @Override
+                    public void insertUpdate(final DocumentEvent e) {
+                        update(e.getDocument());
+                    }
+
+                    @Override
+                    public void removeUpdate(final DocumentEvent e) {
+                        update(e.getDocument());
+                    }
+
+                    private void update(final Document doc) {
+                        try {
+                            webServer.setCustomHTML(doc.getText(0,
+                                    doc.getLength()));
+                        } catch (final BadLocationException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                });
         frmLantorrenttracker.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
                 settings.storeString(SETTINGS_WEBHOST,
                         textFieldWebServerHostName.getText());
                 settings.storeString(SETTINGS_WEBPORT, ftfWebPort.getText());
+                settings.storeString(SETTINGS_CUSTOMHTML,
+                        textAreaCustomHTML.getText());
                 for (final Module module : modules) {
                     module.onClose();
                 }
@@ -161,6 +196,10 @@ public class LanToolWindow {
                 defWebHostString = "";
             }
         }
+        String customHTML = settings.getString(SETTINGS_CUSTOMHTML);
+        if (customHTML == null) {
+            customHTML = "<p>You can place your custom message here!</p>";
+        }
         frmLantorrenttracker = new JFrame();
         frmLantorrenttracker.setMaximumSize(new Dimension(300, 500));
         frmLantorrenttracker.setTitle("LanTools v" + LanTools.VERSION_STRING
@@ -172,17 +211,20 @@ public class LanToolWindow {
         frmLantorrenttracker.getContentPane().add(tabbedPane);
         panelSettings = new JPanel();
         tabbedPane.addTab("Settings", null, panelSettings, null);
-        panelSettings.setLayout(new FormLayout(
-                new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC,
-                        FormFactory.DEFAULT_COLSPEC,
-                        FormFactory.RELATED_GAP_COLSPEC,
-                        ColumnSpec.decode("default:grow"),
-                        FormFactory.RELATED_GAP_COLSPEC,
-                        FormFactory.DEFAULT_COLSPEC, }, new RowSpec[] {
-                        FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, }));
+        panelSettings.setLayout(new FormLayout(new ColumnSpec[] {
+                FormFactory.RELATED_GAP_COLSPEC,
+                FormFactory.DEFAULT_COLSPEC,
+                FormFactory.RELATED_GAP_COLSPEC,
+                ColumnSpec.decode("default:grow"),
+                FormFactory.RELATED_GAP_COLSPEC,
+                FormFactory.DEFAULT_COLSPEC, },
+                new RowSpec[] {
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                RowSpec.decode("default:grow"), }));
         labelWebPort = new JLabel("Server Port:");
         panelSettings.add(labelWebPort, "2, 2, right, default");
         ftfWebPort = new JFormattedTextField();
@@ -196,6 +238,14 @@ public class LanToolWindow {
         textFieldWebServerHostName.setText(defWebHostString);
         panelSettings.add(textFieldWebServerHostName, "4, 4, fill, default");
         textFieldWebServerHostName.setColumns(10);
+        panelSettings.add(btnClearUsers, "6, 4");
+        final JLabel lblCustomHtml = new JLabel("Custom HTML:");
+        panelSettings.add(lblCustomHtml, "2, 6");
+        final JScrollPane scrollPane = new JScrollPane();
+        panelSettings.add(scrollPane, "4, 6, 3, 1, fill, fill");
+        textAreaCustomHTML.setText(customHTML);
+        webServer.setCustomHTML(customHTML);
+        scrollPane.setViewportView(textAreaCustomHTML);
     }
 
     private class BtnClearUsersActionListener implements ActionListener {
