@@ -7,108 +7,109 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UserMapper {
-    private final Map<InetAddress, UserImpl> inetToUserMap;
-    private final Map<String, InetAddress> nameToInetMap;
+	private final Map<InetAddress, UserImpl> inetToUserMap;
+	private final Map<String, InetAddress> nameToInetMap;
 
-    public UserMapper() {
-        inetToUserMap = new HashMap<>();
-        nameToInetMap = new HashMap<>();
-    }
+	public UserMapper() {
+		inetToUserMap = new HashMap<>();
+		nameToInetMap = new HashMap<>();
+	}
 
-    /**
-     * Change the username related to the given address.
-     * You can not use a username that is already mapped to an address.
-     *
-     * @param address
-     *            the address of the user
-     * @param newname
-     *            the name for the user
-     * @return true if it succeeded, otherwise false
-     */
-    public synchronized boolean changeUsername(final InetAddress address,
-            final String newname) {
-        final UserImpl user = inetToUserMap.get(address);
-        if (user == null) { // contains user for the address
-            return false;
-        }
-        if (nameToInetMap.containsKey(newname)) { // contains no user with the new name
-            return false;
-        }
-        user.setUsername(newname);
-        return true;
-    }
+	/**
+	 * Change the username related to the given address.
+	 * You can not use a username that is already mapped to an address.
+	 *
+	 * @param address
+	 *            the address of the user
+	 * @param newname
+	 *            the name for the user
+	 * @return true if it succeeded, otherwise false
+	 */
+	public synchronized boolean changeUsername(final InetAddress address,
+			final String newname) {
+		final UserImpl user = inetToUserMap.get(address);
+		if (user == null) { // contains user for the address
+			return false;
+		}
+		if (nameToInetMap.containsKey(newname)) { // contains no user with the
+													// new name
+			return false;
+		}
+		user.setUsername(newname);
+		return true;
+	}
 
-    public synchronized void clearUsers() {
-        nameToInetMap.clear();
-        inetToUserMap.clear();
-    }
+	public synchronized void clearUsers() {
+		nameToInetMap.clear();
+		inetToUserMap.clear();
+	}
 
-    /**
-     * Get the address to the given name
-     *
-     * @param unsername
-     *            the username to lookup
-     * @return the address, or null if no address is mapped to the given
-     *         username
-     */
-    public synchronized InetAddress getInetAddress(final String username) {
-        return nameToInetMap.get(username);
-    }
+	/**
+	 * Get the address to the given name
+	 *
+	 * @param unsername
+	 *            the username to lookup
+	 * @return the address, or null if no address is mapped to the given
+	 *         username
+	 */
+	public synchronized InetAddress getInetAddress(final String username) {
+		return nameToInetMap.get(username);
+	}
 
-    /**
-     * Get the username mapped to a given address.
-     *
-     * @param address
-     *            the address
-     * @return the mapped username
-     */
-    public synchronized User getUser(final InetAddress address) {
-        return inetToUserMap.get(address);
-    }
+	/**
+	 * Get the username mapped to a given address.
+	 *
+	 * @param address
+	 *            the address
+	 * @return the mapped username
+	 */
+	public synchronized User getUser(final InetAddress address) {
+		return inetToUserMap.get(address);
+	}
 
-    public synchronized Collection<User> getUsers() {
-        return new ArrayList<User>(inetToUserMap.values());
-    }
+	public synchronized Collection<User> getUsers() {
+		return new ArrayList<User>(inetToUserMap.values());
+	}
 
-    public synchronized void removeUserByInetAddress(final InetAddress address) {
-        final UserImpl userImpl = inetToUserMap.remove(address);
-        nameToInetMap.remove(userImpl.getUsername());
-    }
+	public synchronized void removeUserByInetAddress(final InetAddress address) {
+		final UserImpl userImpl = inetToUserMap.remove(address);
+		nameToInetMap.remove(userImpl.getUsername());
+	}
 
-    /**
-     * Set the username corresponding to a specific InetAddress.
-     * You can not set a username that is already used, or set the username of
-     * an address that is already used.
-     *
-     * @param address
-     *            the address of the user
-     * @param username
-     *            the name for the user
-     * @return true if it succeeded, otherwise false
-     */
-    public synchronized boolean setUsername(final InetAddress address,
-            final String username) {
-        if (inetToUserMap.containsKey(address)
-                || nameToInetMap.containsKey(username)) {
-            return false;
-        }
-        final User user = new UserImpl(username, address);
-        addUser(user);
-        return true;
-    }
+	/**
+	 * Set the username corresponding to a specific InetAddress.
+	 * You can not set a username that is already used, or set the username of
+	 * an address that is already used.
+	 *
+	 * @param address
+	 *            the address of the user
+	 * @param username
+	 *            the name for the user
+	 * @return true if it succeeded, otherwise false
+	 */
+	public synchronized boolean setUsername(final InetAddress address,
+			final String username) {
+		if (inetToUserMap.containsKey(address)
+				|| nameToInetMap.containsKey(username)) {
+			return false;
+		}
+		final User user = new UserImpl(username, address);
+		addUser(user);
+		return true;
+	}
 
-    public synchronized void setUsers(final Collection<UserImpl> users) {
-        inetToUserMap.clear();
-        nameToInetMap.clear();
-        for (final UserImpl impl : users) {
-            addUser(impl);
-        }
-    }
+	public synchronized void setUsers(final Collection<UserImpl> users) {
+		inetToUserMap.clear();
+		nameToInetMap.clear();
+		for (final UserImpl impl : users) {
+			addUser(impl);
+		}
+	}
 
-    private void addUser(final User user) {
-        final UserImpl userImpl = new UserImpl(user.getUsername(),
-                user.getInetAddress());
-        inetToUserMap.put(user.getInetAddress(), userImpl);
-        nameToInetMap.put(user.getUsername(), user.getInetAddress());
-    }
+	private void addUser(final User user) {
+		final UserImpl userImpl = new UserImpl(user.getUsername(),
+				user.getInetAddress());
+		inetToUserMap.put(user.getInetAddress(), userImpl);
+		nameToInetMap.put(user.getUsername(), user.getInetAddress());
+	}
 }

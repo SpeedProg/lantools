@@ -6,5 +6,5 @@ import org.simpleframework.http.Response;
 import de.speedprog.lantools.webserver.user.User;
 
 public interface ModuleContainer {
-    public void handle(Request request, Response response, User user);
+	public void handle(Request request, Response response, User user);
 }
