@@ -39,8 +39,8 @@ mychart.Pie(data,{
 			</#list>
 		</table>
        </div>
-		<div class="col-lg-5"><canvas id="chart" width="300" height="300"></canvas>
-		
+		<div class="col-lg-5">
+			<canvas id="chart" width="300" height="300"></canvas>
 		</div>
 	  </div>	
     </div>

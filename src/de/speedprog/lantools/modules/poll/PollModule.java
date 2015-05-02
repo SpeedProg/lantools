@@ -24,7 +24,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -153,6 +155,7 @@ public class PollModule implements Module, ModuleContainer {
 	@Override
 	public void handle(final Request request, final Response response,
 			final User user, List<MenuEntry> menu) {
+		System.out.println(user.getInetAddress().getHostAddress());
 		final Path path = request.getPath();
 		final String pathString = path.toString();
 		if (!pathString.startsWith(basePath)) {
@@ -181,7 +184,7 @@ public class PollModule implements Module, ModuleContainer {
 				action = request.getParameter("action");
 			} catch (final IOException e1) {
 				// TODO Auto-generated catch block
-				sendError(response, "Error retreiving parameter.");
+				sendError(response, "Error retreiving parameter.", menu);
 				e1.printStackTrace();
 				return;
 			}
@@ -194,7 +197,7 @@ public class PollModule implements Module, ModuleContainer {
 				try {
 					pollID = request.getParameter("poll");
 				} catch (final IOException e1) {
-					sendError(response, "Error retreiving parameter.");
+					sendError(response, "Error retreiving parameter.", menu);
 					e1.printStackTrace();
 					return;
 				}
@@ -202,11 +205,11 @@ public class PollModule implements Module, ModuleContainer {
 				try {
 					poll = pollMap.get(UUID.fromString(pollID));
 				} catch (final IllegalArgumentException e) {
-					sendError(response, "Poll ID invalid!");
+					sendError(response, "Poll ID invalid!", menu);
 					return;
 				}
 				if (poll == null) {
-					sendError(response, "Poll ID invalid");
+					sendError(response, "Poll ID invalid", menu);
 					return;
 				}
 				try {
@@ -215,19 +218,32 @@ public class PollModule implements Module, ModuleContainer {
 				} catch (final IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					sendError(response, "Could not load Template.");
+					sendError(response, "Could not load Template.", menu);
 					return;
 				}
-				if (!poll.getOwner().equals(user.getInetAddress())) {
-					dataMap.put("errormsg",
-							"You are not allowed to delete this vote, only the creator can delete votes!");
-					dataMap.put("polls",
-							getFmPolls(pollMap.values(), user.getInetAddress()));
+				try {
+					if (!(poll.getOwner().equals(user.getInetAddress()) || user
+							.getInetAddress().getHostAddress().equals(
+									Inet4Address.getLocalHost()
+											.getHostAddress()))) {
+						dataMap.put("errormsg",
+								"You are not allowed to delete this poll, only the creator can delete a poll!");
+						dataMap.put(
+								"polls",
+								getFmPolls(pollMap.values(),
+										user.getInetAddress()));
+						break;
+					}
+				} catch (UnknownHostException e) {
+					dataMap.put(
+							"errormsg",
+							"Internal Server Error, deleting this vote. "
+									+ e.getMessage());
 					break;
 				}
 				final WebPoll webPoll = pollMap.remove(poll.getUuid());
-				dataMap.put("successmsg", "Poll " + webPoll.getUuid().toString()
-						+ " deleted.");
+				dataMap.put("successmsg", "Poll "
+						+ webPoll.getUuid().toString() + " deleted.");
 				dataMap.put("polls",
 						getFmPolls(pollMap.values(), user.getInetAddress()));
 			}
@@ -239,18 +255,18 @@ public class PollModule implements Module, ModuleContainer {
 				} catch (final IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-					sendError(response, "Error retreiving parameter.");
+					sendError(response, "Error retreiving parameter.", menu);
 					return;
 				}
 				final WebPoll poll;
 				try {
 					poll = pollMap.get(UUID.fromString(pollID));
 				} catch (final IllegalArgumentException e) {
-					sendError(response, "Poll ID invalid!");
+					sendError(response, "Poll ID invalid!", menu);
 					return;
 				}
 				if (poll == null) {
-					sendError(response, "Poll ID invalid");
+					sendError(response, "Poll ID invalid", menu);
 					return;
 				}
 				dataMap.put("poll", getFmPoll(poll, user.getInetAddress()));
@@ -264,7 +280,7 @@ public class PollModule implements Module, ModuleContainer {
 				} catch (final IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					sendError(response, "Template could not be loaded.");
+					sendError(response, "Template could not be loaded.", menu);
 					return;
 				}
 			}
@@ -276,7 +292,7 @@ public class PollModule implements Module, ModuleContainer {
 				} catch (final IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-					sendError(response, "Error retreiving parameters.");
+					sendError(response, "Error retreiving parameters.", menu);
 					return;
 				}
 				final List<Part> parts = form.getParts();
@@ -285,13 +301,13 @@ public class PollModule implements Module, ModuleContainer {
 				try {
 					pollID = UUID.fromString(pollIDString);
 				} catch (final IllegalArgumentException e) {
-					sendError(response, "Poll ID not valid!");
+					sendError(response, "Poll ID not valid!", menu);
 					return;
 				}
 				final List<Integer> optionsList = new LinkedList<>();
 				final WebPoll poll = pollMap.get(pollID);
 				if (poll == null) {
-					sendError(response, "Poll ID not valid!");
+					sendError(response, "Poll ID not valid!", menu);
 					return;
 				}
 				if (!(poll.getVotes() > 1)) {
@@ -311,21 +327,23 @@ public class PollModule implements Module, ModuleContainer {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 								sendError(response,
-										"Could not reteive a parameter.");
+										"Could not reteive a parameter.", menu);
 								return;
 							}
 							try {
 								final Integer id = Integer.valueOf(idString);
 								optionsList.add(id);
 							} catch (final NumberFormatException nfe) {
-								sendError(response, "Error: Invalid option id.");
+								sendError(response,
+										"Error: Invalid option id.", menu);
 								return;
 							}
 						}
 					}
 				}
 				if (optionsList.size() > poll.getVotes()) {
-					sendError(response, "Invalid Number of Options choosen!");
+					sendError(response, "Invalid Number of Options choosen!",
+							menu);
 					return;
 				}
 				final List<PollOption> options = poll.getOptions();
@@ -347,7 +365,7 @@ public class PollModule implements Module, ModuleContainer {
 				} catch (final IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					sendError(response, "Template could not be loaded.");
+					sendError(response, "Template could not be loaded.", menu);
 					return;
 				}
 			}
@@ -359,7 +377,7 @@ public class PollModule implements Module, ModuleContainer {
 				} catch (final IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					sendError(response, "Could not retreive poll id.");
+					sendError(response, "Could not retreive poll id.", menu);
 					return;
 				}
 				final UUID pollID = UUID.fromString(pollIDString);
@@ -374,7 +392,7 @@ public class PollModule implements Module, ModuleContainer {
 				} catch (final IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					sendError(response, "Could not load Template.");
+					sendError(response, "Could not load Template.", menu);
 					return;
 				}
 			}
@@ -387,7 +405,7 @@ public class PollModule implements Module, ModuleContainer {
 				} catch (final IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					sendError(response, "Could not load Template.");
+					sendError(response, "Could not load Template.", menu);
 					return;
 				}
 				dataMap.put("action", basePath + "?" + PAR_ACTION + "="
@@ -401,7 +419,7 @@ public class PollModule implements Module, ModuleContainer {
 				} catch (final IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-					sendError(response, "Could not retreive form value.");
+					sendError(response, "Could not retreive form value.", menu);
 					return;
 				}
 				final List<Part> parts = form.getParts();
@@ -446,7 +464,8 @@ public class PollModule implements Module, ModuleContainer {
 					}
 				} catch (final IOException e) {
 					e.printStackTrace();
-					sendError(response, "Could not retreive a form option.");
+					sendError(response, "Could not retreive a form option.",
+							menu);
 					return;
 				}
 				final UUID id = UUID.randomUUID();
@@ -456,7 +475,8 @@ public class PollModule implements Module, ModuleContainer {
 							Pattern.compile(ipfilter), oneVotePerIp, votes,
 							user.getInetAddress(), id);
 				} catch (final PatternSyntaxException e) {
-					sendError(response, "IP-Filter Pattern had a syntax error!");
+					sendError(response,
+							"IP-Filter Pattern had a syntax error!", menu);
 					return;
 				}
 				for (final String option : optionList) {
@@ -476,7 +496,7 @@ public class PollModule implements Module, ModuleContainer {
 				} catch (final IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					sendError(response, "Could not load Template.");
+					sendError(response, "Could not load Template.", menu);
 					return;
 				}
 			}
@@ -487,17 +507,39 @@ public class PollModule implements Module, ModuleContainer {
 					uuidString = request.getParameter("uuid");
 				} catch (final IOException e) {
 					e.printStackTrace();
-					sendError(response, "Could not retreive a form option.");
+					sendError(response, "Could not retreive a form option.",
+							menu);
 					return;
 				}
 				UUID uuid;
 				try {
 					uuid = UUID.fromString(uuidString);
 				} catch (IllegalArgumentException e) {
-					sendError(response, "You didn't send a valid UUID.");
+					sendError(response, "You didn't send a valid UUID.", menu);
 					return;
 				}
 				WebPoll poll = pollMap.get(uuid);
+				try {
+					if (!(poll.getOwner().equals(user.getInetAddress()) || user
+							.getInetAddress().getHostAddress().equals(
+									Inet4Address.getLocalHost()
+											.getHostAddress()))) {
+						dataMap.put("errormsg",
+								"You are not allowed to create an engrave,"
+										+ " because you are not the owner!");
+						dataMap.put(
+								"polls",
+								getFmPolls(pollMap.values(),
+										user.getInetAddress()));
+						break;
+					}
+				} catch (UnknownHostException e1) {
+					dataMap.put("errormsg",
+							"Internal Server Error " + e1.getMessage());
+					dataMap.put("polls",
+							getFmPolls(pollMap.values(), user.getInetAddress()));
+					break;
+				}
 				WebPoll engravePoll = new WebPoll("Engrave: "
 						+ poll.getQuestion(), poll.isRestrictedByIp(),
 						poll.getIpPattern(), poll.isOneVotePerIp(), 1,
@@ -523,7 +565,8 @@ public class PollModule implements Module, ModuleContainer {
 							response,
 							"There was only "
 									+ mostVotedOptions.size()
-									+ " options with the most votes, but 2 or more are needed.");
+									+ " options with the most votes, but 2 or more are needed.",
+							menu);
 					return;
 				}
 				for (PollOption option : mostVotedOptions) {
@@ -532,19 +575,20 @@ public class PollModule implements Module, ModuleContainer {
 				}
 
 				pollMap.put(engravePoll.getUuid(), engravePoll);
+
 				savePollDataAsync();
 				synchronized (pollMap) {
 					dataMap.put("polls",
 							getFmPolls(pollMap.values(), user.getInetAddress()));
 				}
-				dataMap.put("createdpoll",
-						getFmPoll(engravePoll, user.getInetAddress()));
+				dataMap.put("successmsg", "Poll: " + engravePoll.getQuestion()
+						+ "created with ID " + engravePoll.getUuid().toString());
 				try {
 					template = cfg.getTemplate("poll" + File.separator
 							+ "poll_created.ftl");
 				} catch (final IOException e) {
 					e.printStackTrace();
-					sendError(response, "Could not load Template.");
+					sendError(response, "Could not load Template.", menu);
 					return;
 				}
 			}
@@ -557,7 +601,7 @@ public class PollModule implements Module, ModuleContainer {
 							+ "poll_list.ftl");
 				} catch (final IOException e) {
 					// TODO: logging
-					sendError(response, "Could not open Template.");
+					sendError(response, "Could not open Template.", menu);
 					e.printStackTrace();
 					return;
 				}
@@ -570,7 +614,7 @@ public class PollModule implements Module, ModuleContainer {
 		}
 			break;
 		default:
-			sendError(response, "This Page does not exist!");
+			sendError(response, "This Page does not exist!", menu);
 			return;
 		}
 		try {
@@ -667,7 +711,8 @@ public class PollModule implements Module, ModuleContainer {
 		})).start();
 	}
 
-	private void sendError(final Response response, final String msg) {
+	private void sendError(final Response response, final String msg,
+			List<MenuEntry> menu) {
 		Template template;
 		try {
 			template = cfg.getTemplate("error.ftl");
