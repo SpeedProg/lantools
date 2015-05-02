@@ -54,8 +54,8 @@ import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 
 import de.speedprog.lantools.LanTools;
+import de.speedprog.lantools.modules.MenuEntry;
 import de.speedprog.lantools.modules.ModuleContainer;
-import de.speedprog.lantools.modules.datamodel.MenuModel;
 import de.speedprog.lantools.webserver.WebServer;
 import de.speedprog.lantools.webserver.user.User;
 import freemarker.template.Configuration;
@@ -77,10 +77,10 @@ public class TorrentService implements ModuleContainer {
 	private String trackerHost;
 	private String trackerPort;
 	private final Abdera abdera;
-	private final List<Map<String, String>> menuData;
 	private final static Configuration CFG = LanTools.getFreeMakerConfig();
 	private final WebServer webServer;
 	private final HashMap<String, File> infoHashToFile;
+	private final List<MenuEntry> menu;
 
 	public TorrentService(final String basePath, final Tracker tracker,
 			final String trackerHost, final String trackerPort,
@@ -91,19 +91,16 @@ public class TorrentService implements ModuleContainer {
 		this.trackerHost = trackerHost;
 		this.trackerPort = trackerPort;
 		abdera = new Abdera();
-		final MenuModel menuModel = new MenuModel();
-		menuModel.addLink("Home", "/");
-		menuModel.addLink("Torrent Tracker", basePath);
-		menuModel.addLink("Upload Torrent", basePath + TORRENTUPLOAD_URL);
-		menuModel.addLink("RSS 2.0 Feed", basePath + TORRENT_RSS);
-		menuModel.addLink("Atom 1.0 Feed", basePath + TORRENT_ATOM);
-		menuData = menuModel.getMenuModel();
+		menu = new ArrayList<MenuEntry>();
+		menu.add(new MenuEntry("Upload Torrent", TORRENTUPLOAD_URL));
+		menu.add(new MenuEntry("RSS 2.0 Feed", TORRENT_RSS));
+		menu.add(new MenuEntry("Atom 1.0 Feed", TORRENT_ATOM));
 		infoHashToFile = new HashMap<>();
 	}
 
 	@Override
 	public void handle(final Request req, final Response response,
-			final User user) {
+			final User user, List<MenuEntry> menu) {
 		try {
 			OutputStream outputStream;
 			try {
@@ -121,7 +118,7 @@ public class TorrentService implements ModuleContainer {
 			}
 			final Map<String, Object> dataMap = new HashMap<String, Object>();
 			final Template template;
-			dataMap.put("menulinks", menuData);
+			dataMap.put("menu", menu);
 			dataMap.put("basepath", basePath);
 			dataMap.put("param_action", PARAM_ACTION);
 			dataMap.put("a_del_torrent", ACTION_DELETE);
@@ -149,12 +146,9 @@ public class TorrentService implements ModuleContainer {
 				}
 				switch (relPathString) {
 				case "/": {
-					System.out.println("at /");
 					final String actionString = req.getParameter(PARAM_ACTION);
 					if (actionString != null) {
-						System.out.println("Action: " + actionString);
 						if (actionString.equals(ACTION_DELETE)) {
-							System.out.println("Action delte!");
 							final String torrenthash = req
 									.getParameter(PARAM_TORRENT_INFOHASH);
 							if (torrenthash != null) {
@@ -184,6 +178,7 @@ public class TorrentService implements ModuleContainer {
 						}
 					} else {
 						response.set("Content-Type", "text/html");
+						dataMap.put("title", "Torrentlist");
 						dataMap.put("tdlurl", basePath + TORRENTLOAD_URL
 								+ "?hash=");
 						final List<TrackedTorrent> torrents = new ArrayList<>(
@@ -244,6 +239,7 @@ public class TorrentService implements ModuleContainer {
 						dataMap.put("showform", true);
 						dataMap.put("action", basePath + TORRENTUPLOAD_URL
 								+ "?site=upload");
+						dataMap.put("title", "Upload a Torrent");
 						break;
 					case "upload":
 						final Part part = req.getPart("file");
@@ -299,6 +295,7 @@ public class TorrentService implements ModuleContainer {
 								dataMap.put("torrent", torrent);
 							}
 							dataMap.put("showform", true);
+							dataMap.put("title", "Torrent uploaded");
 							dataMap.put("action", basePath + TORRENTUPLOAD_URL
 									+ "?site=upload");
 						}
@@ -477,5 +474,10 @@ public class TorrentService implements ModuleContainer {
 			torrentDirPath.toFile().mkdirs();
 		}
 		return torrentDirPath;
+	}
+
+	@Override
+	public List<MenuEntry> getMenuEntrys() {
+		return menu;
 	}
 }

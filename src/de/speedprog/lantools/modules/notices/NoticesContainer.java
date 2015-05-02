@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,8 @@ import org.simpleframework.http.Response;
 import org.simpleframework.http.Status;
 
 import de.speedprog.lantools.LanTools;
+import de.speedprog.lantools.modules.MenuEntry;
 import de.speedprog.lantools.modules.ModuleContainer;
-import de.speedprog.lantools.modules.datamodel.MenuModel;
 import de.speedprog.lantools.webserver.MainContainer;
 import de.speedprog.lantools.webserver.user.User;
 import freemarker.template.Configuration;
@@ -43,19 +44,16 @@ public class NoticesContainer implements ModuleContainer {
 	private static final Configuration CFG = LanTools.getFreeMakerConfig();
 	private static final Logger LOGGER = Logger
 			.getLogger(NoticesContainer.class.getName());
-	private final List<Map<String, String>> menuData;
 	private final java.nio.file.Path cfgDirPath;
 	private static final String BOARDMAPFILENAME_STRING = "boardMap.obj";
 	private final File boardMapFile;
 	private final MainContainer mainContainer;
+	private final List<MenuEntry> menu;
 
 	public NoticesContainer(final MainContainer container, final String basePath) {
 		this.mainContainer = container;
 		this.basePath = basePath;
-		final MenuModel menuModel = new MenuModel();
-		menuModel.addLink("Home", "/");
-		menuModel.addLink("Notice Boards", basePath);
-		this.menuData = menuModel.getMenuModel();
+		this.menu = new ArrayList<MenuEntry>();
 		this.cfgDirPath = LanTools.getModuleConfigPath(this.basePath);
 		this.boardMapFile = cfgDirPath.resolve(BOARDMAPFILENAME_STRING)
 				.toFile();
@@ -113,7 +111,7 @@ public class NoticesContainer implements ModuleContainer {
 
 	@Override
 	public void handle(final Request request, final Response response,
-			final User user) {
+			final User user, List<MenuEntry> menu) {
 		try {
 			final Path path = request.getPath();
 			final String pathString = path.getDirectory();
@@ -141,7 +139,7 @@ public class NoticesContainer implements ModuleContainer {
 				data.put("basepath", basePath);
 				data.put("param_action", PARAM_ACTION);
 				data.put("param_boardid", PARAM_BOARDID);
-				data.put("menulinks", menuData);
+				data.put("menu", menu);
 				data.put("user", user);
 				data.put("a_show_board", ACTION_SHOW_BOARD);
 				data.put("a_new_board", ACTION_NEW_BOARD);
@@ -437,5 +435,10 @@ public class NoticesContainer implements ModuleContainer {
 		} catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Error sending internal server error.", e);
 		}
+	}
+
+	@Override
+	public List<MenuEntry> getMenuEntrys() {
+		return menu;
 	}
 }

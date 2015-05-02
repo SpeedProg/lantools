@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<#include "/style.ftl">
-<title>Poll - Vote ${poll.question?html}</title>
-<#include "/jquery.ftl">
-<#if (poll.votes > 1)>
+<#include "/layout.ftl">
+
+<#macro head>
+<script src="/html/jquery.mini.js"></script>
+	<#if (poll.votes > 1)>
 <script type="text/javascript">
 var checkboxes = undefined;
 var max = ${poll.votes};
@@ -24,9 +21,9 @@ $(function(){
 $(checkboxValidate);
 </script>
 </#if>
-</head>
-<#include "/bodystart.ftl">
-<#include "/menu.ftl">
+</#macro>
+
+<#macro body_main>
 <#if poll.restriction == 0>
     <form class="pure-form pure-form-aligned" id="voteform" method="post" action="${action}" enctype="multipart/form-data">
     <fieldset>
@@ -58,5 +55,5 @@ $(checkboxValidate);
     </#if>
     </p>
 </#if>
-</body>
-</html>
+</#macro>
+<@display_page/>

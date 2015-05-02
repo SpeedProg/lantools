@@ -138,7 +138,7 @@ public class FMPoll {
 	}
 
 	private static final String getColor(int stepMax, int stepC) {
-		byte[] color = hsvToRgb(((double) stepC / (double) stepMax), 1.0d, 1.0d);
+		byte[] color = hsvToRgb(((double) stepC / (double) stepMax), 1.0d, 0.5d);
 		return "#" + String.format("%02x", color[0])
 				+ String.format("%02x", color[1])
 				+ String.format("%02x", color[2]);

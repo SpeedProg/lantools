@@ -26,8 +26,8 @@ import org.simpleframework.http.core.Container;
 import org.simpleframework.http.parse.PathParser;
 
 import de.speedprog.lantools.LanTools;
+import de.speedprog.lantools.modules.MenuEntry;
 import de.speedprog.lantools.modules.ModuleContainer;
-import de.speedprog.lantools.modules.datamodel.MenuModel;
 import de.speedprog.lantools.webserver.user.User;
 import de.speedprog.lantools.webserver.user.UserImpl;
 import de.speedprog.lantools.webserver.user.UserMapper;
@@ -37,8 +37,7 @@ import freemarker.template.TemplateException;
 public class MainContainer implements Container, Closeable {
 	private final ConcurrentHashMap<String, NamedModuleContainer> containerMap;
 	private final UserMapper userMapper;
-	private List<Map<String, String>> menuData;
-	private final MenuModel menuModel;
+	private List<MenuEntry> menu;
 	private final File userFile;
 	private static final String USERFILENAME = "users.obj";
 	private static final String ACTION_CHANGE_NAME = "changename";
@@ -47,10 +46,9 @@ public class MainContainer implements Container, Closeable {
 	public MainContainer() {
 		containerMap = new ConcurrentHashMap<String, NamedModuleContainer>();
 		userMapper = new UserMapper();
-		menuModel = new MenuModel();
-		menuModel.addLink("Home", "/");
-		menuModel.addLink("Change Name", "/?action=" + ACTION_CHANGE_NAME);
-		menuData = menuModel.getMenuModel();
+		menu = new ArrayList<MenuEntry>();
+		menu.add(new MenuEntry("Home", "/"));
+		menu.add(new MenuEntry("Change Name", "/?action=" + ACTION_CHANGE_NAME));
 		this.userFile = LanTools.getModuleConfigPath("/").resolve(USERFILENAME)
 				.toFile();
 		try {
@@ -75,10 +73,34 @@ public class MainContainer implements Container, Closeable {
 			throw new IllegalArgumentException(
 					"The base path of a container can only be 1 element long!");
 		}
-		menuModel.addLink(name, basePath);
-		menuData = menuModel.getMenuModel();
+
+		List<MenuEntry> relativeMenu = container.getMenuEntrys();
+		List<MenuEntry> containerMenu = new ArrayList<MenuEntry>(relativeMenu.size()+1);
+		
+		System.out.println(container.getClass().getCanonicalName());
+		// add home menu entry
+		containerMenu.add(new MenuEntry("Home", basePath));
+		containerMenu.addAll(makeMenuEntryListAbsolute(basePath, relativeMenu));
+
+		menu.add(new MenuEntry(name, basePath, containerMenu));
+		System.out.println(menu);
 		return containerMap.put(path.toString(), new NamedModuleContainer(name,
 				container, basePath));
+	}
+	
+	public List<MenuEntry> makeMenuEntryListAbsolute(String base, List<MenuEntry> list) {
+		List<MenuEntry> absoluteMenu = new ArrayList<MenuEntry>();
+		for (MenuEntry e : list) {
+			MenuEntry n;
+			if (e.getHassubmenu()) {
+				n = new MenuEntry(e.getName(), base + e.getLink(),
+						makeMenuEntryListAbsolute(base, e.getSubmenu()));
+			} else {
+				n = new MenuEntry(e.getName(), base + e.getLink());
+			}
+			absoluteMenu.add(n);
+		}
+		return absoluteMenu;
 	}
 
 	public void clearUsers() {
@@ -163,7 +185,8 @@ public class MainContainer implements Container, Closeable {
 					return;
 				}
 				final Map<String, Object> data = new HashMap<>();
-				data.put("menulinks", menuData);
+				data.put("title", "Set Username");
+				data.put("menu", menu);
 				try {
 					template.process(data,
 							new OutputStreamWriter(resp.getOutputStream()));
@@ -274,7 +297,7 @@ public class MainContainer implements Container, Closeable {
 				final NamedModuleContainer container = containerMap.get(reqPath
 						.getDirectory());
 				if (container != null) {
-					container.handle(req, resp, user);
+					container.handle(req, resp, user, menu);
 				} else {
 					try {
 						resp.close();
@@ -327,8 +350,9 @@ public class MainContainer implements Container, Closeable {
 		try {
 			response.set("Content-Type", "text/html");
 			final Map<String, Object> dataMap = new HashMap<String, Object>();
+			dataMap.put("title", "Module List");
 			dataMap.put("customhtml", customHTML);
-			dataMap.put("menulinks", menuData);
+			dataMap.put("menu", menu);
 			final List<NamedModuleContainer> containers = new ArrayList<>(
 					containerMap.values());
 			dataMap.put("modules", containers);

@@ -1,34 +1,14 @@
 <#list polls as poll>
-<div class="pure-menu pure-menu-open pure-menu-horizontal">
-<style type="text/css" scoped>
-.pure-menu .pure-menu-heading {
-    text-transform: none;
-}
-.pure-menu a {
-    text-decoration: underline;
-    background-color: rgba(179, 233, 177, 1);
-
-}
-.pure-menu-heading {
-    font-size: 150%;
-    border-right: medium solid green;
-    text-align: center;
-}
-.pure-menu a:hover {
-    background-color: rgba(60, 164, 56, 1);
-}
-.pure-menu-heading {
-    display: inherit;
-}
-.pure-menu.pure-menu-horizontal > ul {
-    display: inherit;
-}
-</style>
-<div class="pure-menu-heading">${poll.question?html}</div>
-<ul>
-<li><a href="${poll.voteUrl}">Vote</a></li>
-<li><a href="${poll.resultUrl}">Show Result</a></li>
-<li><a href="${poll.deleteUrl}">Delete</a></li>
+<ul class="list-group">
+	<li class="list-group-item"><div class="btn-group">
+  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+    Action <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-left" role="menu">
+    <li><a href="${poll.voteUrl}"><span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span> Vote</a></li>
+    <li><a href="${poll.resultUrl}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Show Result</a></li>
+    <li><a href="${poll.deleteUrl}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete</a></li>
+  </ul>
+</div> ${poll.question?html}</li>
 </ul>
-</div>
 </#list>

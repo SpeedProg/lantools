@@ -1,8 +1,11 @@
 package de.speedprog.lantools.modules.notices;
 
+import java.util.List;
+
 import javax.swing.Icon;
 import javax.swing.JPanel;
 
+import de.speedprog.lantools.modules.MenuEntry;
 import de.speedprog.lantools.modules.Module;
 import de.speedprog.lantools.modules.ModuleContainer;
 import de.speedprog.lantools.webserver.MainContainer;

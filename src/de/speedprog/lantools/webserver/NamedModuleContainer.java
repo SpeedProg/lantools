@@ -15,9 +15,12 @@
  */
 package de.speedprog.lantools.webserver;
 
+import java.util.List;
+
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 
+import de.speedprog.lantools.modules.MenuEntry;
 import de.speedprog.lantools.modules.ModuleContainer;
 import de.speedprog.lantools.webserver.user.User;
 
@@ -50,7 +53,12 @@ public class NamedModuleContainer implements ModuleContainer {
 
 	@Override
 	public void handle(final Request request, final Response response,
-			final User user) {
-		container.handle(request, response, user);
+			final User user, List<MenuEntry> menu) {
+		container.handle(request, response, user, menu);
+	}
+
+	@Override
+	public List<MenuEntry> getMenuEntrys() {
+		return container.getMenuEntrys();
 	}
 }

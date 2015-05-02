@@ -15,9 +15,12 @@
  */
 package de.speedprog.lantools.modules.about;
 
+import java.util.List;
+
 import javax.swing.Icon;
 import javax.swing.JPanel;
 
+import de.speedprog.lantools.modules.MenuEntry;
 import de.speedprog.lantools.modules.Module;
 import de.speedprog.lantools.modules.ModuleContainer;
 
@@ -68,4 +71,5 @@ public class AboutModule implements Module {
 	@Override
 	public void usersCleared() {
 	}
+
 }

@@ -1,12 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<#include "/style.ftl">
-<title>Torrent Tracker - Upload</title>
-</head>
-<#include "/bodystart.ftl">
-<#include "/menu.ftl">
+<#include "/layout.ftl">
+
+<#macro head>
+<link href="/html/css/fileinput.css" rel="stylesheet">
+</#macro>
+
+<#macro body_end>
+<script src="/html/js/fileinput.js"></script>
+</#macro>
+
+<#macro body_main>
 <#if uploaded!false>
 <#if success>
 <p>You uploaded <a href="${tdlurl}${torrent.hexInfoHash}">${torrent.name?html}</a>.</p>
@@ -15,11 +17,17 @@
 </#if>
 </#if>
 <#if showform!false>
-<h2>Upload a Torrent</h2>
 <form class="pure-form" action="${action}" method="post" enctype="multipart/form-data">
-    <label for="file">Torrent File:</label><input type="file" name="file" id="file" />
-    <button class="pure-button pure-button-primary" type="submit" value="Upload">Upload</button>
+	<div class="form-group">
+	<label for="file">Torrent File:</label>
+	<div class="input-group">
+		<input type="text" id="fake_file" class="form-control" placeholder="file..." readonly>
+		<span class="input-group-addon btn btn-default btn-file">Browse<input type="file" name="file" id="file"></span>
+	</div>
+	</div>
+    <button class="btn btn-default" type="submit" value="Upload">Upload</button>
 </form>
 </#if>
-</body>
-</html>
+</#macro>
+
+<@display_page/>

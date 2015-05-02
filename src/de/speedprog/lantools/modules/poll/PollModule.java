@@ -48,9 +48,9 @@ import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 
 import de.speedprog.lantools.LanTools;
+import de.speedprog.lantools.modules.MenuEntry;
 import de.speedprog.lantools.modules.Module;
 import de.speedprog.lantools.modules.ModuleContainer;
-import de.speedprog.lantools.modules.datamodel.MenuModel;
 import de.speedprog.lantools.modules.poll.freenmaker.FMPoll;
 import de.speedprog.lantools.webserver.user.User;
 import freemarker.template.Configuration;
@@ -71,10 +71,10 @@ public class PollModule implements Module, ModuleContainer {
 	private static final String ACTION_CREATE_ENGRAVING_VOTE = "engvote";
 	private Map<UUID, WebPoll> pollMap;
 	private final Configuration cfg;
-	private final List<Map<String, String>> menuData;
 	private final File serializeFile;
 	private final String basePath;
 	private final java.nio.file.Path cfgPath;
+	private final List<MenuEntry> menu;
 
 	public PollModule(final String basePath) {
 		if (basePath == null) {
@@ -83,12 +83,9 @@ public class PollModule implements Module, ModuleContainer {
 			this.basePath = basePath;
 		}
 		cfgPath = LanTools.getModuleConfigPath(this.basePath);
-		final MenuModel menuModel = new MenuModel();
-		menuModel.addLink("Home", "/");
-		menuModel.addLink("Polls", this.basePath);
-		menuModel.addLink("Create Poll", this.basePath + "?" + PAR_ACTION + "="
-				+ ACTION_POLL_FORM);
-		this.menuData = menuModel.getMenuModel();
+		menu = new ArrayList<MenuEntry>();
+		menu.add(new MenuEntry("Create Poll", "?" + PAR_ACTION + "="
+				+ ACTION_POLL_FORM));
 		this.cfg = LanTools.getFreeMakerConfig();
 		new PollPanel();
 		this.serializeFile = cfgPath.resolve("polls.obj").toFile();
@@ -155,7 +152,7 @@ public class PollModule implements Module, ModuleContainer {
 
 	@Override
 	public void handle(final Request request, final Response response,
-			final User user) {
+			final User user, List<MenuEntry> menu) {
 		final Path path = request.getPath();
 		final String pathString = path.toString();
 		if (!pathString.startsWith(basePath)) {
@@ -176,7 +173,7 @@ public class PollModule implements Module, ModuleContainer {
 		final OutputStream os;
 		Template template = null;
 		final Map<String, Object> dataMap = new HashMap<>();
-		dataMap.put("menulinks", getMenuData());
+		dataMap.put("menu", menu);
 		switch (relPathString) {
 		case "/": {
 			String action;
@@ -222,14 +219,14 @@ public class PollModule implements Module, ModuleContainer {
 					return;
 				}
 				if (!poll.getOwner().equals(user.getInetAddress())) {
-					dataMap.put("msg",
+					dataMap.put("errormsg",
 							"You are not allowed to delete this vote, only the creator can delete votes!");
 					dataMap.put("polls",
 							getFmPolls(pollMap.values(), user.getInetAddress()));
 					break;
 				}
 				final WebPoll webPoll = pollMap.remove(poll.getUuid());
-				dataMap.put("msg", "Poll " + webPoll.getUuid().toString()
+				dataMap.put("successmsg", "Poll " + webPoll.getUuid().toString()
 						+ " deleted.");
 				dataMap.put("polls",
 						getFmPolls(pollMap.values(), user.getInetAddress()));
@@ -631,10 +628,6 @@ public class PollModule implements Module, ModuleContainer {
 				+ "?" + PAR_ACTION + "=" + ACTION_DELETE + "&poll=");
 	}
 
-	private List<Map<String, String>> getMenuData() {
-		return menuData;
-	}
-
 	private void savePollData() {
 		synchronized (pollMap) {
 			ObjectOutputStream oos;
@@ -696,7 +689,7 @@ public class PollModule implements Module, ModuleContainer {
 			return;
 		}
 		final Map<String, Object> dataMap = new HashMap<>();
-		dataMap.put("menulinks", getMenuData());
+		dataMap.put("menu", menu);
 		dataMap.put("errormsg", msg);
 		try {
 			final OutputStreamWriter writer = new OutputStreamWriter(
@@ -710,5 +703,10 @@ public class PollModule implements Module, ModuleContainer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public List<MenuEntry> getMenuEntrys() {
+		return menu;
 	}
 }

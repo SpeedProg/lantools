@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<#include "/style.ftl">
+<#include "/layout.ftl">
+
+<#macro head>
 <link rel="stylesheet" href="/html/notices/boardview.css">
-<title>Notices - Boards</title>
-<#include "/jquery.ftl">
-</head>
-<#include "/bodystart.ftl">
-<#include "/menu.ftl">
+</#macro>
+
+<#macro body_main>
 <div class="lantools-content">
     <div class="lantools-header">
     Available Boards
@@ -46,5 +42,6 @@
     </div>
     </form>
 </div>
-</body>
-</html>
+</#macro>
+<@display_page/>
+

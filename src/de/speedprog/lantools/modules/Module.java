@@ -15,6 +15,8 @@
  */
 package de.speedprog.lantools.modules;
 
+import java.util.List;
+
 import javax.swing.Icon;
 import javax.swing.JPanel;
 

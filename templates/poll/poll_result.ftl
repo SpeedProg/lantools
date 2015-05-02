@@ -1,25 +1,7 @@
-<!DOCTYPE html>
-<head>
-<meta charset="UTF-8">
-<#include "/style.ftl">
-<title>Poll - ${poll.question?html} Result</title>
-<#include "/jquery.ftl">
+<#include "/layout.ftl">
+
+<#macro body_end>
 <script src="/html/chart/Chart.min.js"></script>
-</head>
-<#include "/bodystart.ftl">
-<#include "/menu.ftl">
-<table class="pure-table">
-<thead>
-<tr><th>Option<th>Vote Count
-<tbody>
-<#list poll.options as option>
-<tr>
-<td style="color: ${poll.colors[option_index*2]}">${option.name?html}
-<td style="color: ${poll.colors[option_index*2]}">${option.count?html}
-</#list>
-</table>
-<a href="${engravingvote}">Engraving Vote</a>
-<canvas id="chart" width="400" height="400"></canvas>
 <script type="text/javascript">
 var steps = ${poll.options?size}*2;
 var c = 0;
@@ -40,5 +22,30 @@ mychart.Pie(data,{
     animateScale: true
 });
 </script>
-</body>
-</html>
+</#macro>
+
+<#macro body_all>
+    <div class="container-fluid">
+      <div class="row-fluid">
+       <div class="col-lg-5">
+        <table class="table table-bordered table-hover table-condensed">
+			<thead>
+			<tr><th>Option<th>Vote Count
+			<tbody>
+			<#list poll.options as option>
+				<tr>
+					<td style="color: ${poll.colors[option_index*2]}">${option.name?html}
+					<td style="color: ${poll.colors[option_index*2]}">${option.count?html}
+			</#list>
+		</table>
+       </div>
+		<div class="col-lg-5"><canvas id="chart" width="300" height="300"></canvas>
+		
+		</div>
+	  </div>	
+    </div>
+	<div class="row-fluid">
+		<a class="btn btn-primary" href="${engravingvote}">Create Engraving Vote</a>
+	</div>
+</#macro>
+<@display_page/>

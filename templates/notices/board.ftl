@@ -1,10 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<#include "/style.ftl">
+<#include "/layout.ftl">
+
+<#macro head>
 <link rel="stylesheet" href="/html/notices/boardview.css">
-<title>Notices - ${board.name?html}</title>
 <#include "/jquery.ftl">
 <script type="text/javascript">
 function deleteNotice(noticeid) {
@@ -15,9 +12,9 @@ function reloadBoard() {
 }
 window.setInterval(reloadBoard, 10000);
 </script>
-</head>
-<#include "/bodystart.ftl">
-<#include "/menu.ftl">
+</#macro>
+
+<#macro body_main>
 <div class="lantools-content" id="board-${board.id}">
     <div class="lantools-header">
 ${board.name?html}
@@ -56,5 +53,5 @@ Owner: ${(userMapper.getUser(board.owner).username)!"Unknown"?html} Desc: ${boar
     </div>
 </form>
 </div>
-</body>
-</html>
+</#macro>
+<@display_page/>
