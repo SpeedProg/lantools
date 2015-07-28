@@ -16,76 +16,55 @@
 package de.speedprog.lantools.modules.poll;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class PollOption implements Serializable {
-	private final String name;
-	private int count;
-	private final int hashCode;
-	private int id;
+    private final String name;
+    private int id;
+    private final int hashCode;
+    private List<Vote> voteList;
 
-	public PollOption(final String name) {
-		this.name = name;
-		this.hashCode = name.hashCode();
-		this.count = 0;
-		this.id = -1;
-	}
+    public PollOption(final String name, int id) {
+        this.name = name;
+        this.hashCode = name.hashCode();
+        this.id = id;
+    }
 
-	public synchronized void addVotes(final int c) {
-		count += c;
-	}
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof PollOption)) {
-			return false;
-		}
-		final PollOption option = (PollOption) obj;
-		if (option.name.equals(name)) {
-			return true;
-		}
-		return false;
-	}
 
-	/**
-	 * Returns the current vote count.
-	 *
-	 * @return the current vote count.
-	 */
-	public synchronized int getCount() {
-		return count;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public synchronized int getId() {
-		return id;
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof PollOption)) {
+            return false;
+        }
+        final PollOption option = (PollOption) obj;
+        return option.name.equals(name);
+    }
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public int hashCode() {
-		return hashCode;
-	}
+    @Override
+    public int hashCode() {
+        return hashCode;
+    }
 
-	public synchronized void setCount(final int c) {
-		count = c;
-	}
+    public List<Vote> getVoteList() {
+        return voteList;
+    }
 
-	public synchronized void setId(final int id) {
-		this.id = id;
-	}
-
-	/**
-	 * Adds a single vote.
-	 */
-	public synchronized void vote() {
-		count++;
-	}
+    public void addVote(Vote v) {
+        voteList.add(v);
+    }
 }

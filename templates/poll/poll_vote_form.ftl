@@ -2,10 +2,10 @@
 
 <#macro head>
 <script src="/html/jquery.mini.js"></script>
-	<#if (poll.votes > 1)>
+	<#if (poll.maxVotes > 1)>
 <script type="text/javascript">
 var checkboxes = undefined;
-var max = ${poll.votes};
+var max = ${poll.maxVotes};
 function checkboxValidate(){
         console.log("Validate");
         var current = checkboxes.filter(':checked').length;
@@ -28,9 +28,9 @@ $(checkboxValidate);
     <form class="pure-form pure-form-aligned" id="voteform" method="post" action="${action}" enctype="multipart/form-data">
     <fieldset>
     <legend>Poll: ${poll.question?html}</legend>
-    <#if (poll.votes > 1)>
+    <#if (poll.maxVotes > 1)>
     
-    <div id="votesleft">Votes left: ${poll.votes?html}</div><br />
+    <div id="votesleft">Votes left: ${poll.maxVotes?html}</div><br />
     <#list poll.options as option>
     <input class="css-checkbox" type="checkbox" name="option_${option.id}" id="option_${option.id}" value="${option.id}"><label for="option_${option.id}">${option.name?html}</label><br/>
     </#list>

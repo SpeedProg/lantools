@@ -27,18 +27,10 @@ import java.io.OutputStreamWriter;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 import javax.swing.JPanel;
@@ -75,8 +67,7 @@ public class PollModule implements Module, ModuleContainer {
 	private final Configuration cfg;
 	private final File serializeFile;
 	private final String basePath;
-	private final java.nio.file.Path cfgPath;
-	private final List<MenuEntry> menu;
+    private final List<MenuEntry> menu;
 
 	public PollModule(final String basePath) {
 		if (basePath == null) {
@@ -84,7 +75,7 @@ public class PollModule implements Module, ModuleContainer {
 		} else {
 			this.basePath = basePath;
 		}
-		cfgPath = LanTools.getModuleConfigPath(this.basePath);
+        java.nio.file.Path cfgPath = LanTools.getModuleConfigPath(this.basePath);
 		menu = new ArrayList<MenuEntry>();
 		menu.add(new MenuEntry("Create Poll", "?" + PAR_ACTION + "="
 				+ ACTION_POLL_FORM));
@@ -342,21 +333,20 @@ public class PollModule implements Module, ModuleContainer {
 					}
 				}
 				if (optionsList.size() > poll.getVotes()) {
-					sendError(response, "Invalid Number of Options choosen!",
+					sendError(response, "Invalid Number of Options chosen!",
 							menu);
 					return;
 				}
 				final List<PollOption> options = poll.getOptions();
-				final Set<String> optionNameSet = new HashSet<String>(
-						options.size());
+                final Set<Vote> voteSet = new HashSet<>();
 				for (final Integer id : optionsList) {
 					for (final PollOption option : options) {
 						if (option.getId() == id) {
-							optionNameSet.add(option.getName());
+							voteSet.add(new Vote(user, option));
 						}
 					}
 				}
-				poll.vote(user.getInetAddress(), optionNameSet);
+                voteSet.forEach(poll::vote);
 				savePollDataAsync();
 				dataMap.put("poll", getFmPoll(poll, user.getInetAddress()));
 				try {
@@ -480,7 +470,7 @@ public class PollModule implements Module, ModuleContainer {
 					return;
 				}
 				for (final String option : optionList) {
-					webPoll.addOption(new PollOption(option));
+					webPoll.addOption(option);
 				}
 				pollMap.put(id, webPoll);
 				savePollDataAsync();
@@ -508,7 +498,7 @@ public class PollModule implements Module, ModuleContainer {
 				} catch (final IOException e) {
 					e.printStackTrace();
 					sendError(response, "Could not retreive a form option.",
-							menu);
+                            menu);
 					return;
 				}
 				UUID uuid;
@@ -546,20 +536,13 @@ public class PollModule implements Module, ModuleContainer {
 						user.getInetAddress(), UUID.randomUUID());
 				int maxVotes = 0;
 				List<PollOption> mostVotedOptions = new ArrayList<>();
-				for (PollOption option : poll.getOptions()) {
-					if (option.getCount() < maxVotes) {
-						continue;
-					}
-					if (option.getCount() == maxVotes) {
-						mostVotedOptions.add(option);
-						continue;
-					}
-					if (option.getCount() > maxVotes) {
-						maxVotes = option.getCount();
-						mostVotedOptions.clear();
-						mostVotedOptions.add(option);
-					}
-				}
+                List<PollOption> voteList = poll.getOptions();
+                OptionalInt maxVotesOpt = voteList.stream().mapToInt(op -> op.getVoteList().size()).max();
+                if (maxVotesOpt.isPresent()) {
+                    maxVotes = maxVotesOpt.getAsInt();
+                }
+                final int finalMaxVotes = maxVotes;
+                List<PollOption> maxOptions = voteList.stream().filter(opt -> opt.getVoteList().size()== finalMaxVotes).collect(Collectors.toList());
 				if (mostVotedOptions.size() <= 1) {
 					sendError(
 							response,
@@ -570,8 +553,7 @@ public class PollModule implements Module, ModuleContainer {
 					return;
 				}
 				for (PollOption option : mostVotedOptions) {
-					option.setCount(0);
-					engravePoll.addOption(option);
+					engravePoll.addOption(option.getName());
 				}
 
 				pollMap.put(engravePoll.getUuid(), engravePoll);

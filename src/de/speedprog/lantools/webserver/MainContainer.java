@@ -190,16 +190,12 @@ public class MainContainer implements Container, Closeable {
 				try {
 					template.process(data,
 							new OutputStreamWriter(resp.getOutputStream()));
-				} catch (final TemplateException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					resp.setCode(500);
-				} catch (final IOException e) {
+				} catch (final TemplateException | IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					resp.setCode(500);
 				}
-				try {
+                try {
 					resp.close();
 				} catch (final IOException e) {
 					// TODO Auto-generated catch block

@@ -16,66 +16,44 @@
 package de.speedprog.lantools.modules.poll;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Poll implements Serializable {
 	private final String question;
-	private final Map<String, PollOption> options;
-	private final List<PollOption> optionsList;
-	private final int votes;
+	private final Map<String, PollOption> optionsMap;
+	private int maxVotes;
 	private int optionIdCounter;
 
-	public Poll(final String question, final int votes) {
-		this.options = new HashMap<String, PollOption>();
-		this.optionsList = new LinkedList<PollOption>();
+	public Poll(final String question, int maxVotes) {
+		this.optionsMap = new HashMap<>();
 		this.question = question;
-		this.votes = votes;
 		this.optionIdCounter = 0;
+		this.maxVotes = maxVotes;
 	}
 
-	public synchronized void addOption(final PollOption option) {
-		option.setId(optionIdCounter);
+	public synchronized void addOption(String optionName) {
 		optionIdCounter++;
-		options.put(option.getName(), option);
-		optionsList.add(option);
+		optionsMap.put(optionName, new PollOption(optionName, optionIdCounter));
 	}
 
-	public synchronized void addVote(final String name) {
-		addVote(name, 1);
+	public synchronized void addVote(Vote vote) {
+        PollOption option = optionsMap.get(vote.getOption().getName());
+        option.addVote(vote);
 	}
 
-	public synchronized void addVote(final String name, final int count) {
-		final PollOption option = options.get(name);
-		if (option == null) {
-			return;
-		}
-		option.addVotes(count);
-	}
-
-	public synchronized void addVotes(final Set<String> optionSet) {
-		addVotes(optionSet, 1);
-	}
-
-	public synchronized void addVotes(final Set<String> optionSet,
-			final int count) {
-		for (final String opString : optionSet) {
-			addVote(opString, count);
-		}
+	public synchronized void addVotes(final Set<Vote> voteSet) {
+        voteSet.forEach(this::addVote);
 	}
 
 	public List<PollOption> getOptions() {
-		return (new LinkedList<PollOption>(optionsList));
+		return (new ArrayList<PollOption>(optionsMap.values()));
 	}
 
 	public String getQuestion() {
 		return question;
 	}
 
-	public int getVotes() {
-		return votes;
+	public int getMaxVotes() {
+		return maxVotes;
 	}
 }
