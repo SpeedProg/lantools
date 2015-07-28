@@ -301,7 +301,7 @@ public class PollModule implements Module, ModuleContainer {
 					sendError(response, "Poll ID not valid!", menu);
 					return;
 				}
-				if (!(poll.getVotes() > 1)) {
+				if (!(poll.getMaxVotes() > 1)) {
 					final String optionID = form.get("option");
 					try {
 						final Integer id = Integer.valueOf(optionID);
@@ -332,7 +332,7 @@ public class PollModule implements Module, ModuleContainer {
 						}
 					}
 				}
-				if (optionsList.size() > poll.getVotes()) {
+				if (optionsList.size() > poll.getMaxVotes()) {
 					sendError(response, "Invalid Number of Options chosen!",
 							menu);
 					return;
@@ -346,7 +346,7 @@ public class PollModule implements Module, ModuleContainer {
 						}
 					}
 				}
-                voteSet.forEach(poll::vote);
+                voteSet.forEach(vote -> poll.vote(vote.getVoter(), vote.getOption()));
 				savePollDataAsync();
 				dataMap.put("poll", getFmPoll(poll, user.getInetAddress()));
 				try {
@@ -537,12 +537,12 @@ public class PollModule implements Module, ModuleContainer {
 				int maxVotes = 0;
 				List<PollOption> mostVotedOptions = new ArrayList<>();
                 List<PollOption> voteList = poll.getOptions();
-                OptionalInt maxVotesOpt = voteList.stream().mapToInt(op -> op.getVoteList().size()).max();
+                OptionalInt maxVotesOpt = voteList.stream().mapToInt(op -> op.getVotes().size()).max();
                 if (maxVotesOpt.isPresent()) {
                     maxVotes = maxVotesOpt.getAsInt();
                 }
                 final int finalMaxVotes = maxVotes;
-                List<PollOption> maxOptions = voteList.stream().filter(opt -> opt.getVoteList().size()== finalMaxVotes).collect(Collectors.toList());
+                List<PollOption> maxOptions = voteList.stream().filter(opt -> opt.getVotes().size()== finalMaxVotes).collect(Collectors.toList());
 				if (mostVotedOptions.size() <= 1) {
 					sendError(
 							response,

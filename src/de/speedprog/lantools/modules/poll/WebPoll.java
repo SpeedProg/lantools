@@ -100,7 +100,7 @@ public class WebPoll implements Serializable {
         return uuid;
     }
 
-    public int getVotes() {
+    public int getMaxVotes() {
         return poll.getMaxVotes();
     }
 
@@ -121,13 +121,9 @@ public class WebPoll implements Serializable {
 
     public synchronized boolean vote(final User user,
                                      final PollOption option) {
-        return vote(new Vote(user, option));
-    }
-
-    public synchronized boolean vote(Vote vote) {
-        if (isAllowed(vote.getVoter().getInetAddress())) {
-            poll.addVote(vote);
-            ips.add(vote.getVoter().getInetAddress());
+        if (isAllowed(user.getInetAddress())) {
+            poll.addVote(user, option);
+            ips.add(user.getInetAddress());
             return true;
         }
         return false;

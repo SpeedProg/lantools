@@ -15,6 +15,8 @@
  */
 package de.speedprog.lantools.modules.poll;
 
+import de.speedprog.lantools.webserver.user.User;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -36,17 +38,13 @@ public class Poll implements Serializable {
 		optionsMap.put(optionName, new PollOption(optionName, optionIdCounter));
 	}
 
-	public synchronized void addVote(Vote vote) {
-        PollOption option = optionsMap.get(vote.getOption().getName());
-        option.addVote(vote);
-	}
-
-	public synchronized void addVotes(final Set<Vote> voteSet) {
-        voteSet.forEach(this::addVote);
+	public synchronized void addVote(User user, PollOption option) {
+        PollOption option1 = optionsMap.get(option.getName());
+        option1.addVote(user);
 	}
 
 	public List<PollOption> getOptions() {
-		return (new ArrayList<PollOption>(optionsMap.values()));
+		return (new ArrayList<>(optionsMap.values()));
 	}
 
 	public String getQuestion() {

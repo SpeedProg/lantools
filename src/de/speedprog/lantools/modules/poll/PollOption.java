@@ -15,19 +15,23 @@
  */
 package de.speedprog.lantools.modules.poll;
 
+import de.speedprog.lantools.webserver.user.User;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PollOption implements Serializable {
     private final String name;
     private int id;
     private final int hashCode;
-    private List<Vote> voteList;
+    private List<User> voteList;
 
     public PollOption(final String name, int id) {
         this.name = name;
         this.hashCode = name.hashCode();
         this.id = id;
+        this.voteList = new ArrayList<>();
     }
 
 
@@ -60,11 +64,11 @@ public class PollOption implements Serializable {
         return hashCode;
     }
 
-    public List<Vote> getVoteList() {
+    public List<User> getVotes() {
         return voteList;
     }
 
-    public void addVote(Vote v) {
+    public void addVote(User v) {
         voteList.add(v);
     }
 }

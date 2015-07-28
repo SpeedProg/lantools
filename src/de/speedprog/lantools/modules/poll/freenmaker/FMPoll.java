@@ -3,7 +3,6 @@ package de.speedprog.lantools.modules.poll.freenmaker;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,11 +25,7 @@ public class FMPoll {
 			final Collection<WebPoll> polls, final InetAddress cUser,
 			final String vote, final String result, final String delete) {
 		final List<FMPoll> fmPolls = new ArrayList<>(polls.size());
-		for (final Iterator<WebPoll> iterator = polls.iterator(); iterator
-				.hasNext();) {
-			final WebPoll poll = iterator.next();
-			fmPolls.add(createFromWebPoll(poll, cUser, vote, result, delete));
-		}
+        polls.forEach(poll -> fmPolls.add(createFromWebPoll(poll, cUser, vote, result, delete)));
 		return fmPolls;
 	}
 
@@ -49,7 +44,7 @@ public class FMPoll {
 			final String delete) {
 		return new FMPoll(poll.getQuestion(), poll.getOptions(), poll
 				.getOwner().equals(cUser), poll.getUuid(),
-				poll.getRestriction(cUser), poll.getVotes(), vote, result,
+				poll.getRestriction(cUser), poll.getMaxVotes(), vote, result,
 				delete);
 	}
 
@@ -92,7 +87,7 @@ public class FMPoll {
 		}
 	}
 
-	private static final byte[] hsvToRgb(double h, double s, double v) {
+	private static byte[] hsvToRgb(double h, double s, double v) {
 		double r = 0.0d, g = 0.0d, b = 0.0d;
 		double i = Math.floor(h * 6.0d);
 		double f = h * 6.0d - i;
@@ -137,7 +132,7 @@ public class FMPoll {
 				(byte) Math.floor(g * 255), (byte) Math.floor(b * 255) };
 	}
 
-	private static final String getColor(int stepMax, int stepC) {
+	private static String getColor(int stepMax, int stepC) {
 		byte[] color = hsvToRgb(((double) stepC / (double) stepMax), 1.0d, 0.5d);
 		return "#" + String.format("%02x", color[0])
 				+ String.format("%02x", color[1])
